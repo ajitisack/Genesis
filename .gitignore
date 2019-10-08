@@ -2,3 +2,4 @@ nse*.csv
 bse*.csv
 *.pdf
 *.xlsx
+data/*
