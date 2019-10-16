@@ -28,35 +28,39 @@ def create_sqlite_connection(dbfile):
 	conn = None
 	try:
 		conn = sqlite3.connect(dbfile)
+		print("Info : Created connection to sqlite db ", dbfile)
 		return(conn)
 	except Error as e:
 		print(e)
-	print("Info : Created connection to sqlite db ", dbfile)
 	return conn
 
 
-def insert_df_table(conn, df):
-	delete_table = "delete from security;"
+def insert_df_table(conn, df, tblname, index_nm):
+	drop_index = "drop index if exists " + index_nm
 	sqlite = conn.cursor()
-	sqlite.execute(delete_table)
-	df.to_sql("security", conn, if_exists='replace', index=False)
-	print("Info : Inserted dataframe into security table")
+	sqlite.execute(drop_index)
+	print("Info : Dropped index", index_nm, "on", tblname, "table")
+	df.to_sql(tblname, conn, if_exists='replace', index=False)
+	print("Info : Inserted dataframe into", tblname, "table")
 
 
-def create_sec_index(conn):
-	create_index = "create index if not exists index_seccd on security(seccd);"
+def create_index(conn, index_nm, tblname, index_key):
+	create_index = "create index if not exists " + index_nm + " on " + tblname + "(" + index_key + ");"
 	sqlite = conn.cursor()
 	sqlite.execute(create_index)
-	print("Info : Created index on seccd in security table")
+	print("Info : Created " + index_nm + " on " + index_key + " in " + tblname + " table")
 
 
 def main():
 	filename = "../data/ListOfScrips.csv"
 	dbfile = "../data/bse.db"
+	tblname = "security"
+	index_nm = "index_security_seccd"
+	index_key = "seccd"
 	df = read_bse_scripts(filename)
-	sqlite_conn = create_sqlite_connection(dbfile)
-	insert_df_table(sqlite_conn, df)
-	create_sec_index(sqlite_conn)
+	conn = create_sqlite_connection(dbfile)
+	insert_df_table(conn, df, tblname, index_nm)
+	create_index(conn, index_nm, tblname, index_key)
 
 
 if __name__ == "__main__":
