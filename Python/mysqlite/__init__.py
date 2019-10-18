@@ -1,0 +1,4 @@
+from mysqlite.sqlite3_functions import create_sqlite_connection
+from mysqlite.sqlite3_functions import drop_table
+from mysqlite.sqlite3_functions import drop_index
+from mysqlite.sqlite3_functions import create_index
