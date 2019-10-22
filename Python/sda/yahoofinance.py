@@ -1,15 +1,6 @@
-import datetime
-import time
 import requests
 import re
-
-def get_UNIX_dt(dtstr):
-	if dtstr == "": return ""
-	dt = datetime.datetime.strptime(dtstr, "%Y-%m-%d")
-	t = time.mktime(dt.timetuple())
-	t = str(t).split('.')[0]
-	return t
-
+from . import datefeatures
 
 def get_cookies_crumb():
 	url = "https://in.finance.yahoo.com/quote/^BSESN/history"

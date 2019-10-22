@@ -1,5 +1,7 @@
 import pandas as pd
 import sqlite3
+import sda
+from timeit import default_timer as timer
 
 
 def read_bse_scripts(filename):
@@ -24,44 +26,20 @@ def read_bse_scripts(filename):
 	return(df)
 
 
-def create_sqlite_connection(dbfile):
-	conn = None
-	try:
-		conn = sqlite3.connect(dbfile)
-		print("Info : Created connection to sqlite db ", dbfile)
-		return(conn)
-	except Error as e:
-		print(e)
-	return conn
-
-
-def insert_df_table(conn, df, tblname, index_nm):
-	drop_index = "drop index if exists " + index_nm
-	sqlite = conn.cursor()
-	sqlite.execute(drop_index)
-	print("Info : Dropped index", index_nm, "on", tblname, "table")
-	df.to_sql(tblname, conn, if_exists='replace', index=False)
-	print("Info : Inserted dataframe into", tblname, "table")
-
-
-def create_index(conn, index_nm, tblname, index_key):
-	create_index = "create index if not exists " + index_nm + " on " + tblname + "(" + index_key + ");"
-	sqlite = conn.cursor()
-	sqlite.execute(create_index)
-	print("Info : Created " + index_nm + " on " + index_key + " in " + tblname + " table")
-
-
 def main():
-	filename = "../data/ListOfScrips.csv"
 	dbfile = "../data/bse.db"
+	filename = "../data/ListOfScrips.csv"
 	tblname = "security"
 	index_nm = "index_security_seccd"
 	index_key = "seccd"
 	df = read_bse_scripts(filename)
-	conn = create_sqlite_connection(dbfile)
-	insert_df_table(conn, df, tblname, index_nm)
-	create_index(conn, index_nm, tblname, index_key)
+	conn = sda.create_sqlite_connection(dbfile)
+	sda.replace_table_with_df(conn, df, tblname)
+	sda.create_index(conn, tblname, index_nm, index_key)
 
 
 if __name__ == "__main__":
+	start = timer()
 	main()
+	end = timer()
+	print("Execution time : " + str(round(end - start, 3)) + "s")

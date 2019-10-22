@@ -1,4 +1,6 @@
 import sqlite3
+import pandas as pd
+
 
 def create_sqlite_connection(dbfile:str):
 	"""This function creates and returns connection string to sqlite3 database file.
@@ -23,6 +25,7 @@ def create_sqlite_connection(dbfile:str):
 		print(e)
 	return conn
 
+
 def drop_table(conn, tblname):
 	drop_tbl = "drop table if exists " + tblname
 	sqlite = conn.cursor()
@@ -37,7 +40,13 @@ def drop_index(conn, tblname, index_nm):
 	print("Info : Dropped index", index_nm, "on", tblname, "table")
 
 
+def replace_table_with_df(conn, df, tblname):
+	df.to_sql(tblname, conn, if_exists='replace', index=False)
+	print("Info : Table", tblname, "has been replaced")
+
+
 def create_index(conn, tblname, index_nm, index_key):
+	drop_index(conn, tblname, index_nm)
 	create_index = "create index if not exists " + index_nm + " on " + tblname + "(" + index_key + ");"
 	sqlite = conn.cursor()
 	sqlite.execute(create_index)
