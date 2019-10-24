@@ -3,3 +3,4 @@ bse*.csv
 *.pdf
 *.xlsx
 data/*
+Python/sda/__pycache__

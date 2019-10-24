@@ -19,9 +19,5 @@ def enhance_df_with_date_features(df):
 	df["wkday"] = df["date"].dt.dayofweek + 1
 	df["wknr"] = df["date"].dt.week
 	df["qrtr"] = df["date"].dt.quarter
-	df["iswkend"] = 0
-	df["ismthend"] = 0
-	df["isqrtrend"] = 0
-	df["isyrend"] = 0
 	df.drop(columns=['date'], inplace = True)
 	return df

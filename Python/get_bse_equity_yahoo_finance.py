@@ -29,22 +29,6 @@ def prepare_hist_data_df(seccd, hist_data_list):
 	return(df)
 
 
-# def get_security_histdata(sec, startdt, enddt, cookies, crumb):
-# 	if type(enddt) != str: enddt = enddt.strftime("%Y-%m-%d")
-# 	seccd, secid = sec[0], sec[1]
-# 	hist_data_text = query_yahoo_finance(secid, startdt, enddt, cookies, crumb)
-# 	if re.search("error", hist_data_text):
-# 		error_txt = re.findall('"code": *"(.+?)"', hist_data_text)[0]
-# 		if error_txt == "Not Found":
-# 			# print("Err  : Data not found for", sec)
-# 			return pd.DataFrame()
-# 		if error_txt == "Unauthorized":
-# 			# print("Err  : Data not found for", sec)
-# 			return pd.DataFrame()
-# 	hist_data = hist_data_text.split('\n')
-# 	df = prepare_hist_data_df(seccd, hist_data)
-# 	return df
-
 def get_security_histdata(sec, startdt, enddt, cookies, crumb):
 	if type(enddt) != str: enddt = enddt.strftime("%Y-%m-%d")
 	seccd, secid = sec[0], sec[1]
