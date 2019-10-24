@@ -45,8 +45,12 @@ def replace_table_with_df(conn, df, tblname):
 	print("Info : Table", tblname, "has been replaced")
 
 
+def append_table_with_df(conn, df, tblname):
+	df.to_sql(tblname, conn, if_exists='append', index=False)
+	print("Info : Table", tblname, "has been appended")
+
+
 def create_index(conn, tblname, index_nm, index_key):
-	drop_index(conn, tblname, index_nm)
 	create_index = "create index if not exists " + index_nm + " on " + tblname + "(" + index_key + ");"
 	sqlite = conn.cursor()
 	sqlite.execute(create_index)

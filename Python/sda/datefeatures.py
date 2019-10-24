@@ -17,6 +17,7 @@ def enhance_df_with_date_features(df):
 	df["month"] = df["date"].dt.month
 	df["day"] = df["date"].dt.day
 	df["wkday"] = df["date"].dt.dayofweek + 1
+	df["wknr"] = df["date"].dt.week
 	df["qrtr"] = df["date"].dt.quarter
 	df["iswkend"] = 0
 	df["ismthend"] = 0
