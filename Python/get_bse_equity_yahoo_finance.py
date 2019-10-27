@@ -26,8 +26,11 @@ def prepare_hist_data_df(seccd, hist_data_text):
 		print(df.head())
 	df.columns = ["dt", "open", "high", "low", "close", "adjclose", "vol"]
 	df = df[(df["open"] != "null") & (df["dt"] != "")]
-	new_dtypes = {"open":np.float32, "high":np.float32, "low":np.float32, "close":np.float32, "adjclose":np.float32, 'vol':np.int32}
+	# new_dtypes = {"open":np.float32, "high":np.float32, "low":np.float32, "close":np.float32, "adjclose":np.float32, 'vol':np.int32}
+	new_dtypes = {"open":float, "high":float, "low":float, "close":float, "adjclose":float, 'vol':int}
 	df = df.astype(new_dtypes)
+	rounding = {"open":2, "high":2, "low":2, "close":2, "adjclose":2}
+	df = df.round(rounding)
 	df.insert(loc=0, column = "seccd", value=seccd)
 	return(df)
 
@@ -79,7 +82,7 @@ def get_histdata_yf_mp(fname, securities, freq, nthreads, startdt="2000-01-03", 
 def main():
 	if len(sys.argv) < 2:
 		print("Argument Error! Not enough arguments are provided.")
-		print("Syntax: " + sys.argv[0] + "d/w/m [nthreads] [no_of_securities]")
+		print("Syntax: " + sys.argv[0] + " d/w/m [nthreads] [no_of_securities]")
 		return 1
 	try:
 		freq, nthreads, nsecurities = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
@@ -92,6 +95,7 @@ def main():
 	securities = get_active_securities(conn, query, nsecurities)
 	df = get_histdata_yf_mp(tblname, securities, freq, nthreads)
 	df = enhance_df_with_date_features(df)
+	print(df.head())
 	replace_table_with_df(conn, df, tblname)
 	create_index(conn, tblname, index_nm="index_" + tblname + "_seccd", index_key="seccd")
 	create_index(conn, tblname, index_nm="index_" + tblname + "_dt", index_key="dt")
