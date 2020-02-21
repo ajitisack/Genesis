@@ -23,7 +23,7 @@ select
 , A.qrtr
 , A.freq
 from (
-	select *, 'd' freq from equitydly union
-	select *, 'w' freq from equitywly union
-	select *, 'm' freq from equitymly
+	select *, 1 freq from equitydly union all
+	select *, 2 freq from equitywly union all
+	select *, 3 freq from equitymly
 ) A inner join security B on A.seccd  = B.seccd

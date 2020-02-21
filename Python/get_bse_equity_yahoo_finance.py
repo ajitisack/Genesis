@@ -6,14 +6,20 @@ from sda import *
 from timeit import default_timer as timer
 from functools import partial
 import datetime
+import arrow
 import sys
 import numpy as np
+import logging
+
+def print_info(message):
+	t = arrow.now().format('YYYY-MM-DD HH:MM:SS')
+	print(t + " : Info : " + message)
 
 def get_active_securities(conn, query, no_of_securities=0):
 	if no_of_securities != 0: query = query + " limit " + str(no_of_securities)
 	df = pd.read_sql_query(query, conn)
 	security = df.values.tolist()
-	print("Info : Fetched", len(security), "active BSE securities")
+	print_info("Fetched " + str(len(security)) + " active BSE securities")
 	return security
 
 
@@ -26,7 +32,6 @@ def prepare_hist_data_df(seccd, hist_data_text):
 		print(df.head())
 	df.columns = ["dt", "open", "high", "low", "close", "adjclose", "vol"]
 	df = df[(df["open"] != "null") & (df["dt"] != "")]
-	# new_dtypes = {"open":np.float32, "high":np.float32, "low":np.float32, "close":np.float32, "adjclose":np.float32, 'vol':np.int32}
 	new_dtypes = {"open":float, "high":float, "low":float, "close":float, "adjclose":float, 'vol':int}
 	df = df.astype(new_dtypes)
 	rounding = {"open":2, "high":2, "low":2, "close":2, "adjclose":2}
@@ -46,6 +51,7 @@ def get_security_histdata(sec, freq, startdt, enddt, cookies, crumb):
 		if error_txt == "Unauthorized":
 			hist_data_text = query_yahoo_finance(secid, freq, startdt, enddt, cookies, crumb)
 	df = prepare_hist_data_df(seccd, hist_data_text)
+
 	return df
 
 
@@ -55,6 +61,7 @@ def get_bse_equity_histdata_yf(securities, freq, fname, startdt, enddt, cookies,
 		df = get_security_histdata(sec, freq, startdt, enddt, cookies, crumb)
 		if df.empty: continue
 		eq = eq.append(df, ignore_index=True)
+		logging.info("Downloaded data of " + sec[1])
 	return eq
 
 
@@ -67,15 +74,15 @@ def get_histdata_yf_mp(fname, securities, freq, nthreads, startdt="2000-01-03", 
 	cookies, crumb = get_cookies_crumb()
 	nitems = int(len(securities)/nthreads) + 1
 	security_chunks = list(divide_into_chunks(securities, nitems))
-	print("Info : Created", nthreads, "chunks of", len(securities), "securities")
-	print("Info : Initiating", nthreads, "processes to download histdata securities from yahoo finance")
+	print_info("Created " + str(nthreads) + " chunks of " + str(len(securities)) + " securities")
+	print_info("Initiating " + str(nthreads) + " processes to download histdata securities from yahoo finance")
 	target_func = partial(get_bse_equity_histdata_yf, freq=freq, fname=fname, startdt=startdt, enddt=enddt, cookies=cookies, crumb=crumb)
 	pool = mp.Pool(processes = nthreads)
 	df_list = pool.map(target_func, security_chunks)
 	df_final = pd.DataFrame()
 	for df in df_list:
 		df_final = df_final.append(df, ignore_index=True)
-	print("Info : Downloaded historical BSE equity data from yahoo finance", df_final.shape)
+	print_info("Downloaded historical BSE equity data from yahoo finance [" + str(df_final.shape[0]) + ',' + str(df_final.shape[1]) + "]")
 	return df_final
 
 
@@ -87,7 +94,8 @@ def main():
 	try:
 		freq, nthreads, nsecurities = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
 	except:
-		freq, nthreads, nsecurities = 'd', 8, 0
+		freq, nthreads, nsecurities = 'd', 4, 0
+	logging.basicConfig(filename='a.log', filemode='w',format='%(asctime)s - %(process)d - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
 	dbfile = "../data/bse.db"
 	tblname = "equity" + freq + 'ly'
 	query = "SELECT seccd, secid FROM security where secstatus = 'A'"
@@ -95,7 +103,6 @@ def main():
 	securities = get_active_securities(conn, query, nsecurities)
 	df = get_histdata_yf_mp(tblname, securities, freq, nthreads)
 	df = enhance_df_with_date_features(df)
-	print(df.head())
 	replace_table_with_df(conn, df, tblname)
 	create_index(conn, tblname, index_nm="index_" + tblname + "_seccd", index_key="seccd")
 	create_index(conn, tblname, index_nm="index_" + tblname + "_dt", index_key="dt")
