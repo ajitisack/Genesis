@@ -1,6 +1,4 @@
-nse*.csv
-bse*.csv
+*.csv
 *.pdf
 *.xlsx
 data/*
-Python/sda/__pycache__

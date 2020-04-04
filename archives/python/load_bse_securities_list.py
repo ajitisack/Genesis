@@ -6,7 +6,7 @@ from timeit import default_timer as timer
 
 def read_bse_scripts(filename):
 	df=pd.read_csv(filename)
-	df = df.drop(['Instrument'], axis=1)
+	df = df.drop(['Instrument', 'Issuer Name'], axis=1)
 	df.columns = ['seccd', 'secid', 'secnm', 'secstatus', 'secgrp', 'faceval', 'isin', 'industry']
 	df['secgrp'] = df['secgrp'].str.strip()
 	df['isin'] = df['isin'].str.strip()
@@ -27,8 +27,8 @@ def read_bse_scripts(filename):
 
 
 def main():
-	dbfile = "../data/bse.db"
-	filename = "../data/ListOfScrips.csv"
+	dbfile = "data/bse.db"
+	filename = "Equity.csv"
 	tblname = "security"
 	index_nm = "index_security_seccd"
 	index_key = "seccd"

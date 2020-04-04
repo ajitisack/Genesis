@@ -96,7 +96,7 @@ def main():
 	except:
 		freq, nthreads, nsecurities = 'd', 4, 0
 	logging.basicConfig(filename='a.log', filemode='w',format='%(asctime)s - %(process)d - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
-	dbfile = "../data/bse.db"
+	dbfile = "data/bse.db"
 	tblname = "equity" + freq + 'ly'
 	query = "SELECT seccd, secid FROM security where secstatus = 'A'"
 	conn = create_sqlite_connection(dbfile)
