@@ -1,4 +1,3 @@
-import requests as requests
 import pandas as pd
 import json
 import arrow
@@ -11,25 +10,23 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
 
-class Equity():
+class HistData():
 
-    startdt  = '2020-01-01'
-    interval = '1d'
+    startdt    = '2020-01-01'
+    interval   = '1d'
     nodatalist = []
-    tblname   = 'equitydly'
-
-    bse_equityfile = "/Users/ajit/projects/stockmarket_analysis/Equity.csv"
-    bse_securitytbl = 'security'
-    securitystatus = defaultdict(lambda: 'N', {'Active':'A', 'Delisted':'D', 'Suspended':'S'})
+    maxthreads = 20
+    tblname    = 'quotesdly'
+    baseurl    = 'https://query1.finance.yahoo.com/v8/finance/chart'
 
     @staticmethod
-    def getchartresult(securityid):
+    def getchartresult(symbol):
         params = {}
-        params['period1']  = arrow.get(Equity.startdt).timestamp
+        params['period1']  = arrow.get(HistData.startdt).timestamp
         params['period2']  = arrow.now().timestamp
-        params['interval'] = Equity.interval
+        params['interval'] = HistData.interval
         params['events']   = 'history,div,split'
-        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{securityid.upper()}.BO"
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol.upper()}.BO"
         data = requests.get(url=url, params=params)
         return data.json()
 
@@ -68,23 +65,22 @@ class Equity():
         df.index = df.index.astype(int)
         return df[['splits']]
 
-
     @staticmethod
-    def gethistprice(securityid):
-        securityid = securityid.upper()
-        data = Equity.getchartresult(securityid)
+    def gethistprice(symbol):
+        symbol = symbol.upper()
+        data = HistData.getchartresult(symbol)
         if data['chart']['error'] is not None:
-            Equity.nodatalist.append(securityid)
+            HistData.nodatalist.append(symbol)
             return pd.DataFrame()
-        quotes, dividends, splits = Equity.getquotes(data), Equity.getdividends(data), Equity.getsplits(data)
+        quotes, dividends, splits = HistData.getquotes(data), HistData.getdividends(data), HistData.getsplits(data)
         if quotes.empty:
-            Equity.nodatalist.append(securityid)
+            HistData.nodatalist.append(symbol)
             return pd.DataFrame()
         df = pd.concat([quotes, dividends, splits], axis=1, sort=True)
         df['dividend'].fillna(0, inplace=True)
         df['splits'].fillna(0, inplace=True)
         df.dropna(how='any', inplace=True)
-        df.insert(loc=0, column = 'securityid', value=securityid)
+        df.insert(loc=0, column = 'symbol', value=symbol)
         df.insert(loc=1, column = 'exchange', value='BSE')
         df = Utility.adddatefeatures(df)
         df = Utility.reducesize(df)
@@ -94,22 +90,29 @@ class Equity():
     @staticmethod
     @SqlLite.connector
     def getequitylist(n_equitites=5000):
-    	sql = f"SELECT securityid FROM security where status = 'A' limit {n_equitites}"
-    	equitylist = pd.read_sql_query(sql, SqlLite.conn).securityid.to_list()
+    	sql = f"SELECT symbol FROM security where industry <> 'Index Fund' and inbse=1 limit {n_equitites}"
+    	equitylist = pd.read_sql_query(sql, SqlLite.conn).symbol.to_list()
     	return equitylist
 
+    @staticmethod
     @Utility.timer
-    @classmethod
-    def getallhistprice(cls, n_securities=5000):
-        equitylist = Equity.getequitylist(n_securities)
-        nthreads = min(len(equitylist), 20)
+    def getallhistprice(n_symbols=5000):
+        equitylist = HistData.getequitylist(n_symbols)
+        nthreads = min(len(equitylist), HistData.maxthreads)
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
-            results = executor.map(Equity.gethistprice, equitylist)
+            results = executor.map(HistData.gethistprice, equitylist)
         df = pd.concat(results, ignore_index=True)
         return df
 
     @staticmethod
     @SqlLite.connector
-    def loadhistpricedata(df):
-        df.to_sql(Equity.tblname, SqlLite.conn, if_exists='replace', index=False)
+    def loadallhistprice(n_symbols=5000):
+        tblname   = HistData.tblname
+        df = HistData.getallhistprice(n_symbols)
+        df.to_sql(tblname, SqlLite.conn, if_exists='replace', index=False)
         print(f'Table {tblname} has been refreshed with {df.shape[0]} records')
+
+df = HistData.getallhistprice(10)
+df.head()
+
+HistData.loadallhistprice(10)

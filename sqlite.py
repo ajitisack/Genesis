@@ -3,7 +3,8 @@ import functools
 
 class SqlLite():
 	conn = None
-	dbfile = "/Users/ajit/projects/stockmarket_analysis/data/bse.db"
+	# dbfile = "/Users/ajit/projects/stockmarket_analysis/data/bse.db"
+	dbfile = 'C:\\ajit\\equity.db'
 
 	@staticmethod
 	def connector(func):

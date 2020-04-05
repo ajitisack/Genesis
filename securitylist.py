@@ -14,10 +14,10 @@ class Security():
     tblname    = 'security'
     indexcol   = 'symbol'
 
-    bselist = '/Users/ajit/projects/stockmarket_analysis/Equity.csv'
+    basepath = 'c:\\ajit\\stockanalysis'
+    bselist = f'{basepath}\\Equity.csv'
     nselist = 'https://www1.nseindia.com/content/equities/EQUITY_L.csv'
-    # status = defaultdict(lambda: 'N', {'Active':'A', 'Delisted':'D', 'Suspended':'S'})
-    excelfile = '/Users/ajit/projects/stockmarket_analysis/SecurityList.xlsx'
+    excelfile = f'{basepath}\\SecurityList.xlsx'
 
     @staticmethod
     def getbselist():

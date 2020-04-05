@@ -11,11 +11,8 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
 
-class Equity():
+class SecurityDetails():
 
-    startdt  = '2020-01-01'
-    interval = '1d'
-    nodatalist = []
     tblname   = 'equitydly'
 
     bse_equityfile = "/Users/ajit/projects/stockmarket_analysis/Equity.csv"
@@ -77,7 +74,7 @@ class Equity():
     @Utility.timer
     @classmethod
     def getalldetails(cls, n_securities=5000):
-        column_names = ['securityid', 'shortname', 'longname', 'symbol', 'sector', 'industry', 'profitmargins', 'grossmargins', 'revenuegrowth', 'operatingmargins', 'grossprofits'
+        column_names = ['symbol', 'shortname', 'longname', 'symbol', 'sector', 'industry', 'profitmargins', 'grossmargins', 'revenuegrowth', 'operatingmargins', 'grossprofits'
         , 'earningsgrowth' , 'returnonassets', 'returnonequity', 'totalcash', 'totaldebt', 'totalrevenue', 'totalcashpershare', 'revenuepershare'
         , 'regularmarketchange', 'marketcap', 'dividendyield', 'regularmarketchangepercent', 'enterprisetorevenue', 'profitmargins', 'sharesoutstanding', 'bookvalue'
         , 'netincometocommon', 'pricetobook', 'floatshares', 'enterprisevalue']
