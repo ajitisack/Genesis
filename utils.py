@@ -37,8 +37,16 @@ class Utility():
         return df
 
     @staticmethod
-    def getdomainkeyvalue(json_str, domain, key):
-        return [json_str[domain][key]] if domain in json_str and json_str[domain] and key in json_str[domain] else ['']
+    def securitydetailsitems():
+        x = []
+        with open('securitydetails.ini') as f:
+            for line in f:
+                if line.strip() == '': continue
+                if line.strip().startswith('['):
+                    key = line.strip().replace('[','').replace(']','')
+                    continue
+                x.append((key, line.strip()))
+        return x
 
     @staticmethod
     def timer(func):
