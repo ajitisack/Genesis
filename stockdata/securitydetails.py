@@ -4,12 +4,9 @@ import json
 import arrow
 import re
 import requests
-
-from sqlite import SqlLite
-from utils import Utility
-from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
+from .utils import Utility
 
 class SecurityDetails():
 
@@ -46,18 +43,10 @@ class SecurityDetails():
         json_str = self.getquotejson(symbol)
         items = SecurityDetails.getitems(self.secdetailsfile)
         result = [symbol[:-3]] + [SecurityDetails.getdomainkeyvalue(json_str, item[0], item[1]) for item in items]
-        return result
-
-    def getsecuritydetails(self, n_symbols=5000):
-        columns = ['symbol'] + [item[1].lower() for item in SecurityDetails.getitems(self.secdetailsfile)]
-        column_names = ['symbol', 'shortname', 'longname', 'sector', 'industry', 'profitmargins', 'grossmargins', 'revenuegrowth', 'operatingmargins', 'grossprofits'
+        columns = ['symbol'] + [item[1].lower() for item in items]
+        df = pd.DataFrame([result], columns=columns)
+        orderedcolumns = ['symbol', 'shortname', 'longname', 'sector', 'industry', 'profitmargins', 'grossmargins', 'revenuegrowth', 'operatingmargins', 'grossprofits'
         , 'earningsgrowth' , 'returnonassets', 'returnonequity', 'totalcash', 'totaldebt', 'totalrevenue', 'totalcashpershare', 'revenuepershare'
         , 'regularmarketchange', 'marketcap', 'dividendyield', 'regularmarketchangepercent', 'enterprisetorevenue', 'sharesoutstanding', 'bookvalue'
         , 'netincometocommon', 'pricetobook', 'floatshares', 'enterprisevalue']
-        symbols = self.getsymbols(n_symbols)
-        nthreads = min(len(symbols), int(self.maxthreads))
-        with ThreadPoolExecutor(max_workers=nthreads) as executor:
-            results = executor.map(self.getdetails, symbols)
-        df = pd.DataFrame(list(results), columns=columns)
-        df.drop(df.loc[df.symbol==''].index, inplace=True)
-        return df[column_names]
+        return df[orderedcolumns]

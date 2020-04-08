@@ -4,11 +4,7 @@ import arrow
 import re
 import requests
 
-from sqlite import SqlLite
-from utils import Utility
-from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor
-
+from .utils import Utility
 
 class SecurityHistPrice():
 
@@ -47,20 +43,21 @@ class SecurityHistPrice():
         df.index = df.index.astype(int)
         return df[['splits']]
 
-    def getchartresult(self, symbol):
+    def getchartresult(self, symbol, startdt, interval):
         params = {}
-        params['period1']  = arrow.get(self.startdt).timestamp
+        # params['period1']  = arrow.get(self.startdt).timestamp
+        params['period1']  = arrow.get(startdt).timestamp
         params['period2']  = arrow.now().timestamp
-        params['interval'] = self.interval
+        params['interval'] = interval
         params['events']   = 'history,div,split'
         url = f'{self.queryurl}/{symbol}'
         data = requests.get(url=url, params=params)
         return data.json()
 
-    def gethistprice(self, symbol):
+    def gethistprice(self, symbol, startdt, interval):
         symbol = symbol.upper()
         exchange = 'BSE' if symbol.endswith('.BO') else 'NSE'
-        data = self.getchartresult(symbol)
+        data = self.getchartresult(symbol, startdt, interval)
         if data['chart']['error'] is not None:
             self.nodatalist.append(symbol)
             return pd.DataFrame()
@@ -77,12 +74,4 @@ class SecurityHistPrice():
         df = Utility.adddatefeatures(df)
         df = Utility.reducesize(df)
         df.reset_index(drop=True, inplace=True)
-        return df
-
-    def getallhistprice(self, n_symbols=5000):
-        symbols = self.getsymbols(n_symbols)
-        nthreads = min(len(symbols), int(self.maxthreads))
-        with ThreadPoolExecutor(max_workers=nthreads) as executor:
-            results = executor.map(self.gethistprice, symbols)
-        df = pd.concat(results, ignore_index=True)
         return df

@@ -6,7 +6,7 @@ from configparser import ExtendedInterpolation
 class SqlLite():
 	conn = None
 	cp = ConfigParser(interpolation=ExtendedInterpolation())
-	cp.read('config.ini')
+	cp.read("./stockdata/config.ini")
 	dbfile = cp.get('database', 'dbfile')
 
 	def connector(func):

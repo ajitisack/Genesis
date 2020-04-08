@@ -6,7 +6,7 @@ import re
 import requests
 from collections import defaultdict
 
-from utils import Utility
+from .utils import Utility
 
 class SecurityList():
 
