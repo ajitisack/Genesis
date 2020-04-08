@@ -36,7 +36,7 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
     def downloadhistprice(self, n_symbols, loadtotable, startdt, interval):
         tblname = self.tbl_quotesdly if interval == '1d' else self.tbl_quotesmly
         symbols = self.getsymbols(n_symbols)
-        print(f'Downloading historical prices from yahoo finance for {n_symbols} symbols', end='...', flush=True)
+        print(f'Downloading historical prices from yahoo finance for {len(symbols)} symbols', end='...', flush=True)
         nthreads = min(len(symbols), int(self.maxthreads))
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
             results = executor.map(self.gethistprice, symbols, repeat(startdt), repeat(interval))
@@ -49,7 +49,7 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
     def downloaddetails(self, n_symbols, loadtotable):
         tblname = self.tbl_secdetails
         symbols = self.getsymbols(n_symbols)
-        print(f'Downloading details of {n_symbols} symbols from yahoo finance', end='...', flush=True)
+        print(f'Downloading details of {len(symbols)} symbols from yahoo finance', end='...', flush=True)
         nthreads = min(len(symbols), int(self.maxthreads))
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
             results = executor.map(self.getdetails, symbols)
