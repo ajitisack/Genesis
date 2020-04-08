@@ -10,25 +10,7 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
 
-class HistData():
-
-    startdt    = '2020-01-01'
-    interval   = '1d'
-    nodatalist = []
-    maxthreads = 20
-    tblname    = 'quotesdly'
-    baseurl    = 'https://query1.finance.yahoo.com/v8/finance/chart'
-
-    @staticmethod
-    def getchartresult(symbol):
-        params = {}
-        params['period1']  = arrow.get(HistData.startdt).timestamp
-        params['period2']  = arrow.now().timestamp
-        params['interval'] = HistData.interval
-        params['events']   = 'history,div,split'
-        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol.upper()}.BO"
-        data = requests.get(url=url, params=params)
-        return data.json()
+class SecurityHistPrice():
 
     @staticmethod
     def getquotes(data):
@@ -65,54 +47,42 @@ class HistData():
         df.index = df.index.astype(int)
         return df[['splits']]
 
-    @staticmethod
-    def gethistprice(symbol):
+    def getchartresult(self, symbol):
+        params = {}
+        params['period1']  = arrow.get(self.startdt).timestamp
+        params['period2']  = arrow.now().timestamp
+        params['interval'] = self.interval
+        params['events']   = 'history,div,split'
+        url = f'{self.queryurl}/{symbol}'
+        data = requests.get(url=url, params=params)
+        return data.json()
+
+    def gethistprice(self, symbol):
         symbol = symbol.upper()
-        data = HistData.getchartresult(symbol)
+        exchange = 'BSE' if symbol.endswith('.BO') else 'NSE'
+        data = self.getchartresult(symbol)
         if data['chart']['error'] is not None:
-            HistData.nodatalist.append(symbol)
+            self.nodatalist.append(symbol)
             return pd.DataFrame()
-        quotes, dividends, splits = HistData.getquotes(data), HistData.getdividends(data), HistData.getsplits(data)
+        quotes, dividends, splits = SecurityHistPrice.getquotes(data), SecurityHistPrice.getdividends(data), SecurityHistPrice.getsplits(data)
         if quotes.empty:
-            HistData.nodatalist.append(symbol)
+            self.nodatalist.append(symbol)
             return pd.DataFrame()
         df = pd.concat([quotes, dividends, splits], axis=1, sort=True)
         df['dividend'].fillna(0, inplace=True)
         df['splits'].fillna(0, inplace=True)
         df.dropna(how='any', inplace=True)
         df.insert(loc=0, column = 'symbol', value=symbol)
-        df.insert(loc=1, column = 'exchange', value='BSE')
+        df.insert(loc=1, column = 'exchange', value=exchange)
         df = Utility.adddatefeatures(df)
         df = Utility.reducesize(df)
         df.reset_index(drop=True, inplace=True)
         return df
 
-    @staticmethod
-    @SqlLite.connector
-    def getequitylist(n_equitites=5000):
-    	sql = f"SELECT symbol FROM security where industry <> 'Index Fund' and inbse=1 limit {n_equitites}"
-    	equitylist = pd.read_sql_query(sql, SqlLite.conn).symbol.to_list()
-    	return equitylist
-
-    @staticmethod
-    @Utility.timer
-    def getallhistprice(n_symbols=5000):
-        equitylist = HistData.getequitylist(n_symbols)
-        nthreads = min(len(equitylist), HistData.maxthreads)
+    def getallhistprice(self, n_symbols=5000):
+        symbols = self.getsymbols(n_symbols)
+        nthreads = min(len(symbols), int(self.maxthreads))
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
-            results = executor.map(HistData.gethistprice, equitylist)
+            results = executor.map(self.gethistprice, symbols)
         df = pd.concat(results, ignore_index=True)
         return df
-
-    @staticmethod
-    @SqlLite.connector
-    def loadallhistprice(n_symbols=5000):
-        tblname   = HistData.tblname
-        df = HistData.getallhistprice(n_symbols)
-        df.to_sql(tblname, SqlLite.conn, if_exists='replace', index=False)
-        print(f'Table {tblname} has been refreshed with {df.shape[0]} records')
-
-df = HistData.getallhistprice(10)
-df.head()
-
-HistData.loadallhistprice(10)
