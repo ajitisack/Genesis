@@ -46,8 +46,8 @@ class SecurityList(SDLogger):
         df.sort_values('symbol', inplace=True)
         columns = ['symbol', 'inbse', 'innse', 'name', 'grp', 'industry', 'facevalue', 'isin']
         df = df[columns]
-        with pd.ExcelWriter(self.excel_seclist) as writer:
-            bse.to_excel(writer, sheet_name='BSE', index=False, freeze_panes=(1,0))
-            nse.to_excel(writer, sheet_name='NSE', index=False, freeze_panes=(1,0))
-            df.to_excel(writer, sheet_name='All', index=False, freeze_panes=(1,0))
+        # with pd.ExcelWriter(self.excel_seclist) as writer:
+        #     bse.to_excel(writer, sheet_name='BSE', index=False, freeze_panes=(1,0))
+        #     nse.to_excel(writer, sheet_name='NSE', index=False, freeze_panes=(1,0))
+        #     df.to_excel(writer, sheet_name='All', index=False, freeze_panes=(1,0))
         return df
