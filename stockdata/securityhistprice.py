@@ -71,7 +71,7 @@ class SecurityHistPrice(SDLogger):
             df['dividend'].fillna(0, inplace=True)
             df['splits'].fillna(0, inplace=True)
             df.dropna(how='any', inplace=True)
-            df.insert(loc=0, column = 'symbol', value=symbol)
+            df.insert(loc=0, column = 'symbol', value=symbol[:-3])
             df.insert(loc=1, column = 'exchange', value=exchange)
             df = Utility.adddatefeatures(df)
             df = Utility.reducesize(df)
