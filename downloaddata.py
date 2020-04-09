@@ -1,7 +1,6 @@
 import stockdata as sd
+import sys
 
-sd.download(startdt='2010-01-01')
-
-sql = 'select * from quotes where 1 = 1 limit 10'
-df = sd.getdata(sql)
-df
+if __name__ == '__main__':
+    dt = sys.argv[1] if len(sys.argv) == 2 else '2015-01-01'
+    sd.download(startdt={dt})
