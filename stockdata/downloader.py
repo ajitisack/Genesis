@@ -19,7 +19,7 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
     def getsymbols(self, n_symbols):
         query = f"select symbol, inbse, innse from security where 1 = 1 and industry != 'Index Fund' limit {n_symbols}"
         df = pd.read_sql(query, SqlLite.conn)
-        df['ticker'] = df.apply(lambda x: x['symbol'] + '.BO' if x['innse']==0 and x['inbse']==1 else x['symbol'] + '.NS' , axis=1)
+        df['ticker'] = df.apply(lambda x: x['symbol'] + '.BO' if x['inbse']==1 else x['symbol'] + '.NS' , axis=1)
         return list(df.ticker)
 
     @Utility.timer

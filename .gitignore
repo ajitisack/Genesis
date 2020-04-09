@@ -1,4 +1,7 @@
 *.csv
 *.pdf
 *.xlsx
-data/*
+stockdata/*.db
+*.db
+__pycache__/*
+stockdata/__pycache__/*

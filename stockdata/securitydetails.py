@@ -7,8 +7,9 @@ import requests
 from concurrent.futures import ThreadPoolExecutor
 
 from .utils import Utility
+from .sdlogger import SDLogger
 
-class SecurityDetails():
+class SecurityDetails(SDLogger):
 
     @staticmethod
     def getdomainkeyvalue(json_str, domain, key):
@@ -40,13 +41,17 @@ class SecurityDetails():
     	return json.loads(new_data)
 
     def getdetails(self, symbol):
-        json_str = self.getquotejson(symbol)
-        items = SecurityDetails.getitems(self.secdetailsfile)
-        result = [symbol[:-3]] + [SecurityDetails.getdomainkeyvalue(json_str, item[0], item[1]) for item in items]
-        columns = ['symbol'] + [item[1].lower() for item in items]
-        df = pd.DataFrame([result], columns=columns)
-        orderedcolumns = ['symbol', 'shortname', 'longname', 'sector', 'industry', 'profitmargins', 'grossmargins', 'revenuegrowth', 'operatingmargins', 'grossprofits'
-        , 'earningsgrowth' , 'returnonassets', 'returnonequity', 'totalcash', 'totaldebt', 'totalrevenue', 'totalcashpershare', 'revenuepershare'
-        , 'regularmarketchange', 'marketcap', 'dividendyield', 'regularmarketchangepercent', 'enterprisetorevenue', 'sharesoutstanding', 'bookvalue'
-        , 'netincometocommon', 'pricetobook', 'floatshares', 'enterprisevalue']
-        return df[orderedcolumns]
+        try:
+            json_str = self.getquotejson(symbol)
+            items = SecurityDetails.getitems(self.secdetailsfile)
+            result = [symbol[:-3]] + [SecurityDetails.getdomainkeyvalue(json_str, item[0], item[1]) for item in items]
+            columns = ['symbol'] + [item[1].lower() for item in items]
+            df = pd.DataFrame([result], columns=columns)
+            orderedcolumns = ['symbol', 'shortname', 'longname', 'sector', 'industry', 'profitmargins', 'grossmargins', 'revenuegrowth', 'operatingmargins', 'grossprofits'
+            , 'earningsgrowth' , 'returnonassets', 'returnonequity', 'totalcash', 'totaldebt', 'totalrevenue', 'totalcashpershare', 'revenuepershare'
+            , 'regularmarketchange', 'marketcap', 'dividendyield', 'regularmarketchangepercent', 'enterprisetorevenue', 'sharesoutstanding', 'bookvalue'
+            , 'netincometocommon', 'pricetobook', 'floatshares', 'enterprisevalue']
+            if df.empty: self.msglogger.info('no hist price for {symbol}')
+            return df[orderedcolumns]
+        except:
+            self.msglogger.error('no hist price for {symbol}')

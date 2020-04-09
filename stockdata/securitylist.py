@@ -7,8 +7,9 @@ import requests
 from collections import defaultdict
 
 from .utils import Utility
+from .sdlogger import SDLogger
 
-class SecurityList():
+class SecurityList(SDLogger):
 
     def getbselist(self):
         df = pd.read_csv(self.bselist)

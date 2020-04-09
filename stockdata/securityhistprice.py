@@ -5,8 +5,9 @@ import re
 import requests
 
 from .utils import Utility
+from .sdlogger import SDLogger
 
-class SecurityHistPrice():
+class SecurityHistPrice(SDLogger):
 
     @staticmethod
     def getquotes(data):
@@ -55,23 +56,26 @@ class SecurityHistPrice():
         return data.json()
 
     def gethistprice(self, symbol, startdt, interval):
-        symbol = symbol.upper()
-        exchange = 'BSE' if symbol.endswith('.BO') else 'NSE'
-        data = self.getchartresult(symbol, startdt, interval)
-        if data['chart']['error'] is not None:
-            self.nodatalist.append(symbol)
-            return pd.DataFrame()
-        quotes, dividends, splits = SecurityHistPrice.getquotes(data), SecurityHistPrice.getdividends(data), SecurityHistPrice.getsplits(data)
-        if quotes.empty:
-            self.nodatalist.append(symbol)
-            return pd.DataFrame()
-        df = pd.concat([quotes, dividends, splits], axis=1, sort=True)
-        df['dividend'].fillna(0, inplace=True)
-        df['splits'].fillna(0, inplace=True)
-        df.dropna(how='any', inplace=True)
-        df.insert(loc=0, column = 'symbol', value=symbol)
-        df.insert(loc=1, column = 'exchange', value=exchange)
-        df = Utility.adddatefeatures(df)
-        df = Utility.reducesize(df)
-        df.reset_index(drop=True, inplace=True)
-        return df
+        try:
+            symbol = symbol.upper()
+            exchange = 'BSE' if symbol.endswith('.BO') else 'NSE'
+            data = self.getchartresult(symbol, startdt, interval)
+            if data['chart']['error'] is not None:
+                self.msglogger.info(f'no hist price for {symbol}')
+                return pd.DataFrame()
+            quotes, dividends, splits = SecurityHistPrice.getquotes(data), SecurityHistPrice.getdividends(data), SecurityHistPrice.getsplits(data)
+            if quotes.empty:
+                self.msglogger.info(f'no hist price for {symbol}')
+                return pd.DataFrame()
+            df = pd.concat([quotes, dividends, splits], axis=1, sort=True)
+            df['dividend'].fillna(0, inplace=True)
+            df['splits'].fillna(0, inplace=True)
+            df.dropna(how='any', inplace=True)
+            df.insert(loc=0, column = 'symbol', value=symbol)
+            df.insert(loc=1, column = 'exchange', value=exchange)
+            df = Utility.adddatefeatures(df)
+            df = Utility.reducesize(df)
+            df.reset_index(drop=True, inplace=True)
+            return df
+        except:
+            self.msglogger.error(f'no hist price for {symbol}')
