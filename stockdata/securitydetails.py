@@ -4,7 +4,7 @@ import json
 import arrow
 import re
 import requests
-from concurrent.futures import ThreadPoolExecutor
+from requests.adapters import HTTPAdapter
 
 from .utils import Utility
 from .sdlogger import SDLogger
@@ -28,17 +28,17 @@ class SecurityDetails(SDLogger):
         return x
 
     def getquotejson(self, symbol):
-    	url = f'{self.quoteurl}/{symbol}'
-    	html = requests.get(url=url).text
-    	if "QuoteSummaryStore" not in html:
-    		html = requests.get(url=url).text
-    		if "QuoteSummaryStore" not in html:
-    			return {}
-    	json_str = html.split('root.App.main =')[1].split('(this)')[0].split(';\n}')[0].strip()
-    	data = json.loads(json_str)['context']['dispatcher']['stores']['QuoteSummaryStore']
-    	new_data = json.dumps(data).replace('{}', 'null')
-    	new_data = re.sub(r'\{[\'|\"]raw[\'|\"]:(.*?),(.*?)\}', r'\1', new_data)
-    	return json.loads(new_data)
+        url = f'{self.quoteurl}/{symbol}'
+        with requests.Session() as s:
+            s.mount(url, HTTPAdapter(max_retries=self.request_max_rtries))
+            response = s.get(url)
+        if "QuoteSummaryStore" not in response.text:
+            return {}
+        json_str = response.text.split('root.App.main =')[1].split('(this)')[0].split(';\n}')[0].strip()
+        data = json.loads(json_str)['context']['dispatcher']['stores']['QuoteSummaryStore']
+        new_data = json.dumps(data).replace('{}', 'null')
+        new_data = re.sub(r'\{[\'|\"]raw[\'|\"]:(.*?),(.*?)\}', r'\1', new_data)
+        return json.loads(new_data)
 
     def getdetails(self, symbol):
         try:
@@ -47,11 +47,7 @@ class SecurityDetails(SDLogger):
             result = [symbol[:-3]] + [SecurityDetails.getdomainkeyvalue(json_str, item[0], item[1]) for item in items]
             columns = ['symbol'] + [item[1].lower() for item in items]
             df = pd.DataFrame([result], columns=columns)
-            orderedcolumns = ['symbol', 'shortname', 'longname', 'sector', 'industry', 'profitmargins', 'grossmargins', 'revenuegrowth', 'operatingmargins', 'grossprofits'
-            , 'earningsgrowth' , 'returnonassets', 'returnonequity', 'totalcash', 'totaldebt', 'totalrevenue', 'totalcashpershare', 'revenuepershare'
-            , 'regularmarketchange', 'marketcap', 'dividendyield', 'regularmarketchangepercent', 'enterprisetorevenue', 'sharesoutstanding', 'bookvalue'
-            , 'netincometocommon', 'pricetobook', 'floatshares', 'enterprisevalue']
             if df.empty: self.msglogger.info('no hist price for {symbol}')
-            return df[orderedcolumns]
+            return df
         except:
             self.msglogger.error('no hist price for {symbol}')

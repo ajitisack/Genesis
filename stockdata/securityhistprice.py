@@ -3,6 +3,7 @@ import json
 import arrow
 import re
 import requests
+from requests.adapters import HTTPAdapter
 
 from .utils import Utility
 from .sdlogger import SDLogger
@@ -44,16 +45,27 @@ class SecurityHistPrice(SDLogger):
         df.index = df.index.astype(int)
         return df[['splits']]
 
+    # def getchartresult(self, symbol, startdt, interval):
+    #     params = {}
+    #     params['period1']  = arrow.get(startdt).timestamp
+    #     params['period2']  = arrow.now().timestamp
+    #     params['interval'] = interval
+    #     params['events']   = 'history,div,split'
+    #     url = f'{self.queryurl}/{symbol}'
+    #     data = requests.get(url=url, params=params)
+    #     return data.json()
+
     def getchartresult(self, symbol, startdt, interval):
         params = {}
-        # params['period1']  = arrow.get(self.startdt).timestamp
         params['period1']  = arrow.get(startdt).timestamp
         params['period2']  = arrow.now().timestamp
-        params['interval'] = interval
+        params['interval'] = '1d'
         params['events']   = 'history,div,split'
         url = f'{self.queryurl}/{symbol}'
-        data = requests.get(url=url, params=params)
-        return data.json()
+        with requests.Session() as s:
+            s.mount(url, HTTPAdapter(max_retries=self.request_max_rtries))
+            chart = s.get(url, params=params)
+        return chart.json()
 
     def gethistprice(self, symbol, startdt, interval):
         try:
