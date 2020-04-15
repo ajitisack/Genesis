@@ -45,16 +45,6 @@ class SecurityHistPrice(SDLogger):
         df.index = df.index.astype(int)
         return df[['splits']]
 
-    # def getchartresult(self, symbol, startdt, interval):
-    #     params = {}
-    #     params['period1']  = arrow.get(startdt).timestamp
-    #     params['period2']  = arrow.now().timestamp
-    #     params['interval'] = interval
-    #     params['events']   = 'history,div,split'
-    #     url = f'{self.queryurl}/{symbol}'
-    #     data = requests.get(url=url, params=params)
-    #     return data.json()
-
     def getchartresult(self, symbol, startdt, interval):
         params = {}
         params['period1']  = arrow.get(startdt).timestamp

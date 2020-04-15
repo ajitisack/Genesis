@@ -1,0 +1,3 @@
+handle datatypes
+auto download of BSE security list
+adding technical indicators

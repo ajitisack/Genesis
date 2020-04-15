@@ -31,19 +31,35 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
         SqlLite.loadtable(df, tblname)
         SqlLite.createindex(tblname, 'symbol')
 
+    def loadactions(self, df):
+        tblname = self.tbl_actions
+        splits = df[df.splits != 0][['symbol', 'date', 'splits', 'year', 'month', 'day', 'wkday', 'wknr', 'qrtr']]
+        splits.insert(loc=2, column = 'action', value='splits')
+        splits.rename(columns = {'splits':'value'}, inplace = True)
+        splits.reset_index(drop=True, inplace=True)
+        dividend = df[df.dividend != 0][['symbol', 'date', 'dividend', 'year', 'month', 'day', 'wkday', 'wknr', 'qrtr']]
+        dividend.insert(loc=2, column = 'action', value='dividend')
+        dividend.rename(columns = {'dividend':'value'}, inplace = True)
+        dividend.reset_index(drop=True, inplace=True)
+        actions = pd.concat([splits, dividend], ignore_index=True)
+        SqlLite.loadtable(actions, tblname)
+        SqlLite.createindex(tblname, 'symbol')
+
     @Utility.timer
     def downloadhistprice(self, n_symbols, loadtotable, startdt, interval):
         tblname = self.tbl_quotesdly if interval == '1d' else self.tbl_quotesmly
         symbols = self.getsymbols(n_symbols)
-        print(f'Downloading historical prices and actions from yahoo finance for {len(symbols)} symbols', end='...', flush=True)
+        print(f'Downloading historical prices and actions from yahoo finance for {len(symbols)} symbols from {startdt}', end='...', flush=True)
         nthreads = min(len(symbols), int(self.maxthreads))
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
             results = executor.map(self.gethistprice, symbols, repeat(startdt), repeat(interval))
         df = pd.concat(results, ignore_index=True)
         print('Completed')
         if not loadtotable: return df
-        SqlLite.loadtable(df, tblname)
+        histprice = df.drop(['dividend', 'splits'], axis=1)
+        SqlLite.loadtable(histprice, tblname)
         SqlLite.createindex(tblname, 'symbol')
+        self.loadactions(df)
 
     @Utility.timer
     def downloaddetails(self, n_symbols, loadtotable):
