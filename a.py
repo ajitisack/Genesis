@@ -1,2 +1,6 @@
 import stockdata as sd
-import pandas as pd
+
+
+df = sd.getdata("select * from histprice where symbol='HDFC'")
+
+sd.addMA(df, 5)

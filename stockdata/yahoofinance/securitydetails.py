@@ -6,8 +6,8 @@ import re
 import requests
 from requests.adapters import HTTPAdapter
 
-from .utils import Utility
-from .sdlogger import SDLogger
+from ..utils import Utility
+from ..sdlogger import SDLogger
 
 class SecurityDetails(SDLogger):
 

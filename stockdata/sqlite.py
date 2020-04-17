@@ -3,7 +3,7 @@ import functools
 from configparser import ConfigParser
 from configparser import ExtendedInterpolation
 
-class SqlLite():
+class SqLite():
 	conn = None
 	cp = ConfigParser(interpolation=ExtendedInterpolation())
 	cp.read("./stockdata/config.ini")
@@ -12,14 +12,14 @@ class SqlLite():
 	def connector(func):
 		@functools.wraps(func)
 		def wrapper(*args):
-			SqlLite.conn = sqlite3.connect(SqlLite.dbfile)
+			SqLite.conn = sqlite3.connect(SqLite.dbfile)
 			return func(*args)
-			SqlLite.conn.close
+			SqLite.conn.close
 		return wrapper
 
 	@staticmethod
 	def createconn():
-		return sqlite3.connect(SqlLite.dbfile)
+		return sqlite3.connect(SqLite.dbfile)
 
 	@staticmethod
 	@connector
@@ -28,7 +28,7 @@ class SqlLite():
 			print('Dataframe is empty!')
 			return None
 		print(f'Refreshing table [{tblname}] with {df.shape[0]} records', end='...', flush=True)
-		df.to_sql(tblname, SqlLite.conn, if_exists='replace', index=False)
+		df.to_sql(tblname, SqLite.conn, if_exists='replace', index=False)
 		print('Completed')
 
 	@staticmethod
@@ -37,5 +37,5 @@ class SqlLite():
 		indexname = f'index_{tblname}_{indexcol}'
 		print(f'Creating index on {tblname}({indexcol})', end='...', flush=True)
 		create_index = f'create index if not exists {indexname} on {tblname}({indexcol});'
-		SqlLite.conn.cursor().execute(create_index)
+		SqLite.conn.cursor().execute(create_index)
 		print('Completed')

@@ -6,8 +6,8 @@ import re
 import requests
 from collections import defaultdict
 
-from .utils import Utility
-from .sdlogger import SDLogger
+from ..utils import Utility
+from ..sdlogger import SDLogger
 
 class SecurityList(SDLogger):
 

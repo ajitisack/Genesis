@@ -1,11 +1,13 @@
 import pandas as pd
 
-from .downloader import Downloader
-from .sqlite import SqlLite
+from .yahoofinance.downloader import Downloader
+from .sqlite import SqLite
+from .utils import Utility
 
-@SqlLite.connector
-def getdata(sql):
-    df = pd.read_sql(sql, SqlLite.conn)
+@SqLite.connector
+def getdata(query):
+    df = pd.read_sql('', SqLite.conn)
+    df = Utility.reducesize(df)
     return df
 
 def download(startdt='2020-01-01'):
@@ -19,27 +21,16 @@ def download(startdt='2020-01-01'):
 
 def downloadsymbols():
     '''This function downloads all symbols of NSE and BSE into sqlite3 db'''
-    d = Downloader()
-    d.downloadsymbols()
-    del d
+    Downloader().downloadsymbols()
 
 def downloaddlyhistprice(n_symbols=5000, loadtotable=True, startdt='2020-01-01'):
     '''This function downloads daily historical price of all symbols of NSE and BSE from yahoo finance into sqlite3 db'''
-    d = Downloader()
-    df = d.downloadhistprice(n_symbols, loadtotable, startdt, interval='1d')
-    del d
-    return df
+    return Downloader().downloadhistprice(n_symbols, loadtotable, startdt, interval='1d')
 
 def downloadmlyhistprice(n_symbols=5000, loadtotable=True, startdt='2020-01-01'):
     '''This function downloads monthly historical price of all symbols of NSE and BSE from yahoo finance into sqlite3 db'''
-    d = Downloader()
-    df = d.downloadhistprice(n_symbols, loadtotable, startdt, interval='1mo')
-    del d
-    return df
+    return Downloader().downloadhistprice(n_symbols, loadtotable, startdt, interval='1mo')
 
 def downloaddetails(n_symbols=5000, loadtotable=True):
     '''This function downloads details of all symbols of NSE and BSE from yahoo finance into sqlite3 db'''
-    d = Downloader()
-    df = d.downloaddetails(n_symbols, loadtotable)
-    del d
-    return df
+    return Downloader().downloaddetails(n_symbols, loadtotable)

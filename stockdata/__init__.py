@@ -4,3 +4,6 @@ from .stockdata import downloadsymbols
 from .stockdata import downloaddlyhistprice
 from .stockdata import downloadmlyhistprice
 from .stockdata import downloaddetails
+
+from .techindicators import addIndicators
+from .techindicators import addMA

@@ -31,13 +31,10 @@ class Utility():
 
     @staticmethod
     def reducesize(df):
-        # new_dtypes = {'open':np.float32, 'high':np.float32, 'low':np.float32, 'close':np.float32, 'adjclose':np.float32, 'volume':np.int32
-        #             , 'year':np.int16, 'month':np.int16, 'day':np.int16, 'wkday':np.int16, 'wknr':np.int16, 'qrtr':np.int16}
-        # df = df.astype(new_dtypes)
-        # return df
         for i in df.columns:
-            df[i] = pd.to_numeric(df[i], errors='ignore', downcast='integer')
-            df[i] = pd.to_numeric(df[i], errors='ignore', downcast='float')
+            if 'date' not in i:
+                df[i] = pd.to_numeric(df[i], errors='ignore', downcast='integer')
+                df[i] = pd.to_numeric(df[i], errors='ignore', downcast='float')
         return df
 
     @staticmethod

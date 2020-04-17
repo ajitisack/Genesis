@@ -5,9 +5,9 @@ from concurrent.futures import ThreadPoolExecutor
 from .securitylist import SecurityList
 from .securityhistprice import SecurityHistPrice
 from .securitydetails import SecurityDetails
-from .config import Config
-from .sqlite import SqlLite
-from .utils import Utility
+from ..config import Config
+from ..sqlite import SqLite
+from ..utils import Utility
 
 class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
 
@@ -15,10 +15,10 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
         self.nodatalist = []
         Config.__init__(self)
 
-    @SqlLite.connector
+    @SqLite.connector
     def getsymbols(self, n_symbols):
         query = f"select symbol, inbse, innse from {self.tbl_seclist} where 1 = 1 limit {n_symbols}"
-        df = pd.read_sql(query, SqlLite.conn)
+        df = pd.read_sql(query, SqLite.conn)
         df['ticker'] = df.apply(lambda x: x['symbol'] + '.NS' if x['innse']==1 else x['symbol'] + '.BO' , axis=1)
         return list(df.ticker)
 
@@ -28,8 +28,8 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
         print(f'Fetching list of all BSE and NSE Equities', end='...', flush=True)
         df = self.getsecuritylist()
         print('Completed')
-        SqlLite.loadtable(df, tblname)
-        SqlLite.createindex(tblname, 'symbol')
+        SqLite.loadtable(df, tblname)
+        SqLite.createindex(tblname, 'symbol')
 
     def loadactions(self, df):
         tblname = self.tbl_actions
@@ -42,10 +42,10 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
         dividend.rename(columns = {'dividend':'value'}, inplace = True)
         dividend.reset_index(drop=True, inplace=True)
         actions = pd.concat([splits, dividend], ignore_index=True)
-        dividend = SqlLite.reducesize(dividend)
-        actions  = SqlLite.reducesize(actions)
-        SqlLite.loadtable(actions, tblname)
-        SqlLite.createindex(tblname, 'symbol')
+        dividend = Utility.reducesize(dividend)
+        actions  = Utility.reducesize(actions)
+        SqLite.loadtable(actions, tblname)
+        SqLite.createindex(tblname, 'symbol')
 
     @Utility.timer
     def downloadhistprice(self, n_symbols, loadtotable, startdt, interval):
@@ -59,8 +59,8 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
         print('Completed')
         if not loadtotable: return df
         histprice = df.drop(['dividend', 'splits'], axis=1)
-        SqlLite.loadtable(histprice, tblname)
-        SqlLite.createindex(tblname, 'symbol')
+        SqLite.loadtable(histprice, tblname)
+        SqLite.createindex(tblname, 'symbol')
         self.loadactions(df)
 
     @Utility.timer
@@ -81,7 +81,7 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
         df     = Utility.reducesize(df)
         df_esg = Utility.reducesize(df_esg)
         if not loadtotable: return df, df_esg
-        SqlLite.loadtable(df, self.tbl_secdetails)
-        SqlLite.createindex(self.tbl_secdetails, 'symbol')
-        SqlLite.loadtable(df_esg, self.tbl_esgdetail)
-        SqlLite.createindex(self.tbl_esgdetail, 'symbol')
+        SqLite.loadtable(df, self.tbl_secdetails)
+        SqLite.createindex(self.tbl_secdetails, 'symbol')
+        SqLite.loadtable(df_esg, self.tbl_esgdetail)
+        SqLite.createindex(self.tbl_esgdetail, 'symbol')
