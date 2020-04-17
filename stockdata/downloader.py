@@ -42,6 +42,8 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
         dividend.rename(columns = {'dividend':'value'}, inplace = True)
         dividend.reset_index(drop=True, inplace=True)
         actions = pd.concat([splits, dividend], ignore_index=True)
+        dividend = SqlLite.reducesize(dividend)
+        actions  = SqlLite.reducesize(actions)
         SqlLite.loadtable(actions, tblname)
         SqlLite.createindex(tblname, 'symbol')
 
@@ -76,6 +78,8 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
         df_esg = df[['symbol'] + esgcols]
         df_esg = df_esg.drop(df_esg.loc[df_esg.peergroup==''].index).reset_index(drop=True)
         df.drop(esgcols, axis=1, inplace=True)
+        df     = Utility.reducesize(df)
+        df_esg = Utility.reducesize(df_esg)
         if not loadtotable: return df, df_esg
         SqlLite.loadtable(df, self.tbl_secdetails)
         SqlLite.createindex(self.tbl_secdetails, 'symbol')
