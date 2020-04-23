@@ -2,14 +2,13 @@ import pandas as pd
 from itertools import repeat
 from concurrent.futures import ThreadPoolExecutor
 
-from .securitylist import SecurityList
 from .securityhistprice import SecurityHistPrice
 from .securitydetails import SecurityDetails
 from ..config import Config
 from ..sqlite import SqLite
 from ..utils import Utility
 
-class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
+class Downloader(Config, SecurityHistPrice, SecurityDetails):
 
     def __init__(self):
         self.nodatalist = []
@@ -17,19 +16,9 @@ class Downloader(Config, SecurityList, SecurityHistPrice, SecurityDetails):
 
     @SqLite.connector
     def getsymbols(self, n_symbols):
-        query = f"select symbol, inbse, innse from {self.tbl_seclist} where 1 = 1 limit {n_symbols}"
+        query = f"select symbol from {self.tbl_symbols} where 1 = 1 limit {n_symbols}"
         df = pd.read_sql(query, SqLite.conn)
-        df['ticker'] = df.apply(lambda x: x['symbol'] + '.NS' if x['innse']==1 else x['symbol'] + '.BO' , axis=1)
-        return list(df.ticker)
-
-    @Utility.timer
-    def downloadsymbols(self):
-        tblname = self.tbl_seclist
-        print(f'Fetching list of all BSE and NSE Equities', end='...', flush=True)
-        df = self.getsecuritylist()
-        print('Completed')
-        SqLite.loadtable(df, tblname)
-        SqLite.createindex(tblname, 'symbol')
+        return list(df.symbol)
 
     def loadactions(self, df):
         tblname = self.tbl_actions

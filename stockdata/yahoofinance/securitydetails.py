@@ -44,7 +44,7 @@ class SecurityDetails(SDLogger):
         try:
             json_str = self.getquotejson(symbol)
             items = SecurityDetails.getitems(self.secdetailsfile)
-            result = [symbol[:-3]] + [SecurityDetails.getdomainkeyvalue(json_str, item[0], item[1]) for item in items]
+            result = [symbol] + [SecurityDetails.getdomainkeyvalue(json_str, item[0], item[1]) for item in items]
             columns = ['symbol'] + [item[1].lower() for item in items]
             df = pd.DataFrame([result], columns=columns)
             if df.empty: self.msglogger.info('no hist price for {symbol}')

@@ -7,6 +7,7 @@ class SqLite():
 	conn = None
 	cp = ConfigParser(interpolation=ExtendedInterpolation())
 	cp.read("./stockdata/config.ini")
+	# cp.read("config.ini")
 	dbfile = cp.get('database', 'dbfile')
 
 	def connector(func):

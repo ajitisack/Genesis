@@ -7,3 +7,10 @@ __pycache__/*
 stockdata/*.db
 *.db
 stockdata/__pycache__/*
+docs/*
+excel/*.xlsx
+excel/*.xls
+docs/*.txt
+docs/*.pdf
+docs/*.doc
+docs/*.docx
