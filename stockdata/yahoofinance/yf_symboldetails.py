@@ -6,14 +6,11 @@ import re
 import requests
 from requests.adapters import HTTPAdapter
 
-from ..utils import Utility
-from ..sdlogger import SDLogger
-
-class SecurityDetails(SDLogger):
+class SymbolDetails():
 
     def getitems(self):
         x = []
-        with open(self.secdetailsfile) as f:
+        with open(self.yfdetailsfile) as f:
             for line in f:
                 line = line.strip()
                 if line == '': continue
@@ -24,7 +21,7 @@ class SecurityDetails(SDLogger):
         return x
 
     def getquotejson(self, symbol):
-        url = f'{self.quoteurl}/{symbol}'
+        url = f'{self.yfquoteurl}/{symbol}'
         with requests.Session() as session:
             session.mount(url, HTTPAdapter(max_retries=self.request_max_retries))
             response = session.get(url)

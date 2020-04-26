@@ -31,7 +31,7 @@ class MoneyControl(SDLogger, Config, SectorClassify, SymbolDetails):
         return items
 
     @Utility.timer
-    def downloaddetails_mc(self, n_symbols, loadtotable):
+    def downloaddetails(self, n_symbols, loadtotable):
         x = 'all' if n_symbols == 0 else n_symbols
         print(f'Downloading details of {x} symbols from Money Control', end='...', flush=True)
         tblname = self.tbl_mcprofile

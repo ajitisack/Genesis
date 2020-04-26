@@ -30,7 +30,7 @@ class SectorClassify():
         with requests.Session() as session:
             for exchange in ['nse', 'bse']:
                 for sector in self.getsectors():
-                    url = f'{self.mc_sectorclassif_url}/{exchange}/{sector}.html'
+                    url = f'{self.mcsectorclassifurl}/{exchange}/{sector}.html'
                     session.mount(url, HTTPAdapter(max_retries=self.request_max_retries))
                     html = session.get(url).text
                     tree = HTMLParser(html)

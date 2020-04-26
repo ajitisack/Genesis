@@ -11,7 +11,7 @@ class SymbolDetails():
 
     def getsymboldetails(self, params):
         exchange, symbolurl = params
-        url = f'{self.mc_base_url}/{symbolurl}'
+        url = f'{self.mcbaseurl}/{symbolurl}'
         values = {'symbolcd' : symbolurl.split('/')[2], 'exchange' : exchange}
         try:
             with requests.Session() as session:
@@ -21,7 +21,7 @@ class SymbolDetails():
             if symbolid == '': return values
             values['symbolid'] = symbolid
             for section in self.terms.keys():
-                api = f'{self.mc_price_api_url}/{exchange}/{section}/{symbolid}'
+                api = f'{self.mcpriceapiurl}/{exchange}/{section}/{symbolid}'
                 with requests.Session() as session:
                     session.mount(api, HTTPAdapter(max_retries=self.request_max_retries))
                     response = session.get(api, allow_redirects=False)
