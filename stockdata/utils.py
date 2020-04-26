@@ -35,6 +35,7 @@ class Utility():
             if 'date' not in i:
                 df[i] = pd.to_numeric(df[i], errors='ignore', downcast='integer')
                 df[i] = pd.to_numeric(df[i], errors='ignore', downcast='float')
+        df = df.applymap(lambda x: np.round(x, 2) if type(x) == float else x)
         return df
 
     @staticmethod

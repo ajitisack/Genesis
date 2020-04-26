@@ -64,7 +64,6 @@ class Symbols(SDLogger):
         df['innse'] = df['nsesymbol'].apply(lambda x: 1 if x in list(nse.symbol) else 0)
         df['inbse'] = df['bsesymbol'].apply(lambda x: 1 if x in list(bse.symbol) else 0)
         df['inall'] = df.apply(lambda x: 1 if x['innse']==1 and x['inbse']==1 else 0, axis=1)
-        df['symbol'] = df.apply(lambda x: x['symbol']+'.NS' if x['innse']==1 else x['symbol']+'.BO', axis=1)
         new_cols = ['isin', 'symbol', 'innse', 'inbse', 'inall', 'nsesymbol', 'bsesymbol', 'name', 'industry', 'facevalue', 'group', 'series', 'dateoflisting', 'paidupvalue', 'marketlot']
         df = Utility.reducesize(df[new_cols])
         df.fillna('', inplace=True)

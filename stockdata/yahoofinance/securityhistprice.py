@@ -53,7 +53,7 @@ class SecurityHistPrice(SDLogger):
         params['events']   = 'history,div,split'
         url = f'{self.queryurl}/{symbol}'
         with requests.Session() as s:
-            s.mount(url, HTTPAdapter(max_retries=self.request_max_rtries))
+            s.mount(url, HTTPAdapter(max_retries=self.request_max_retries))
             chart = s.get(url, params=params)
         return chart.json()
 
@@ -73,9 +73,9 @@ class SecurityHistPrice(SDLogger):
             df['dividend'].fillna(0, inplace=True)
             df['splits'].fillna(0, inplace=True)
             df.dropna(how='any', inplace=True)
-            df.insert(loc=0, column = 'symbol', value=symbol)
-            # df.insert(loc=0, column = 'symbol', value=symbol[:-3])
-            # df.insert(loc=1, column = 'exchange', value=exchange)
+            # df.insert(loc=0, column = 'symbol', value=symbol)
+            df.insert(loc=0, column = 'symbol', value=symbol[:-3])
+            df.insert(loc=1, column = 'exchange', value=exchange)
             df = Utility.adddatefeatures(df)
             df = Utility.reducesize(df)
             df.reset_index(drop=True, inplace=True)

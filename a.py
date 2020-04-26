@@ -1,4 +1,6 @@
 import stockdata as sd
 
+df = sd.downloadsectorclassify()
+sd.loadtable(df, 'sectormc')
 
-df = sd.download()
+sd.downloaddetailsmc()

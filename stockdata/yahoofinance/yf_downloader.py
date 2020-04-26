@@ -8,15 +8,17 @@ from ..config import Config
 from ..sqlite import SqLite
 from ..utils import Utility
 
-class Downloader(Config, SecurityHistPrice, SecurityDetails):
+class YahooFinance(Config, SecurityHistPrice, SecurityDetails):
 
     def __init__(self):
         self.nodatalist = []
         Config.__init__(self)
+        self.details_items = self.getitems()
 
     @SqLite.connector
     def getsymbols(self, n_symbols):
-        query = f"select symbol from {self.tbl_symbols} where 1 = 1 limit {n_symbols}"
+        query = f"select symbol || '.NS' as symbol from symbols where innse = 1 union all select symbol || '.BO' as symbol from symbols where inbse = 1 "
+        if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)
 
@@ -53,13 +55,13 @@ class Downloader(Config, SecurityHistPrice, SecurityDetails):
         self.loadactions(df)
 
     @Utility.timer
-    def downloaddetails(self, n_symbols, loadtotable):
+    def downloaddetails_yf(self, n_symbols, loadtotable):
         symbols = self.getsymbols(n_symbols)
-        print(f'Downloading details and esg scores of {len(symbols)} symbols from yahoo finance', end='...', flush=True)
+        print(f'Downloading details and esg scores of {len(symbols)} symbols from Yahoo Finance', end='...', flush=True)
         nthreads = min(len(symbols), int(self.maxthreads))
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
             results = executor.map(self.getdetails, symbols)
-        df = pd.concat(results, ignore_index=True)
+        df = pd.DataFrame(results)
         df = df.drop(df.loc[df.shortname==''].index).reset_index(drop=True)
         print('Completed')
         esgcols = ['peergroup', 'peercount', 'environmentscore', 'socialscore', 'governancescore', 'totalesg', 'percentile', 'esgperformance', 'highestcontroversy'
