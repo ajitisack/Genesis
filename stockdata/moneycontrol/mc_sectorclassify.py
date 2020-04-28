@@ -23,7 +23,6 @@ class SectorClassify():
             sectors = f.read().splitlines()
         return sectors
 
-    @Utility.timer
     def getsectorclassif(self):
         n = 6
         dfs = []

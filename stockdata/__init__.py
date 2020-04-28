@@ -1,5 +1,5 @@
 from .stockdata import getdata
-from .stockdata import loadtable
+from .stockdata import loadtotable
 
 from .stockdata import download
 from .stockdata import downloadsymbols

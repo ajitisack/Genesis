@@ -27,15 +27,17 @@ class Utility():
         df['wkday'] = df['date'].dt.dayofweek + 1
         df['wknr'] = df['date'].dt.week
         df['qrtr'] = df['date'].dt.quarter
+        df['date'] = df['date'].dt.date
         return df
 
     @staticmethod
     def reducesize(df):
-        for i in df.columns:
-            if 'date' not in i:
-                df[i] = pd.to_numeric(df[i], errors='ignore', downcast='integer')
-                df[i] = pd.to_numeric(df[i], errors='ignore', downcast='float')
-        df = df.applymap(lambda x: np.round(x, 2) if type(x) == float else x)
+        # downsize int columns of the dataframe
+        int_cols = df.select_dtypes(include=['int64', 'int32', 'int16']).columns
+        df[int_cols] = df[int_cols].apply(lambda x: pd.to_numeric(x, errors='ignore', downcast='integer'))
+        # round float columns to 2 decimal places
+        float_cols = df.select_dtypes(include=['float64', 'float32']).columns
+        df[float_cols] = df[float_cols].apply(lambda x: round(x, 2))
         return df
 
     @staticmethod

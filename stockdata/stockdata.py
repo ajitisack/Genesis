@@ -10,11 +10,11 @@ from .utils import Utility
 
 @SqLite.connector
 def getdata(query):
-    df = pd.read_sql('', SqLite.conn)
+    df = pd.read_sql(query, SqLite.conn)
     df = Utility.reducesize(df)
     return df
 
-def loadtable(df, tblname):
+def loadtotable(df, tblname):
     df = Utility.reducesize(df)
     SqLite.loadtable(df, tblname)
 

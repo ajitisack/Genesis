@@ -21,14 +21,13 @@ class HistData(HistDataDict):
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)
 
-    def loadtotable(self, df, tblname):
+    def processdf(self, df):
         df['date'] = df['date'].apply(lambda x: arrow.get(x).format('YYYY-MM-DD'))
         df['symbol'] = df['symbol'].apply(lambda x: x[:-3])
         df['exchange'] = df['exchange'].apply(lambda x: x.replace('NSI', 'NSE'))
         df = Utility.adddatefeatures(df)
         df = Utility.reducesize(df)
-        SqLite.loadtable(df, tblname)
-        SqLite.createindex(tblname, 'symbol')
+        return df
 
     @Utility.timer
     def download(self, n_symbols, loadtotable, startdt):
@@ -38,12 +37,18 @@ class HistData(HistDataDict):
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
             results = executor.map(self.gethistdata, symbols, repeat(startdt))
         values = list(results)
-        return values
         histprice = pd.concat([pd.DataFrame(i[0]) for i in values], ignore_index=True)
         dividends = pd.concat([pd.DataFrame(i[1]) for i in values], ignore_index=True)
         splits    = pd.concat([pd.DataFrame(i[2]) for i in values], ignore_index=True)
         actions   = pd.concat([dividends, splits], ignore_index=True)
+        histprice = self.processdf(histprice)
+        actions   = self.processdf(actions)
+        histprice = histprice.dropna()
+        actions = actions.dropna()
+        histprice = histprice.astype({'volume': int})
         print('Completed!')
         if not loadtotable: return histprice, actions
-        self.loadtotable(histprice, self.tbl_hpricedly)
-        self.loadtotable(actions, self.tbl_actions)
+        SqLite.loadtable(histprice, self.tbl_hpricedly)
+        SqLite.createindex(self.tbl_hpricedly, 'symbol')
+        SqLite.loadtable(actions, self.tbl_actions)
+        SqLite.createindex(self.tbl_actions, 'symbol')

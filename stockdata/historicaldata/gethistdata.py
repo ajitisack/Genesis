@@ -7,23 +7,42 @@ from ..sdlogger import SDLogger
 
 class HistDataDict(SDLogger):
 
+    # def getquotes(self, data):
+    #     indicators = data.get('indicators')
+    #     if indicators is None or indicators == '' : return {}
+    #     quotes = indicators.get('quote')
+    #     if quotes is None or quotes == '': return {}
+    #     quotes = quotes[0]
+    #     if quotes is None or quotes == '': return {}
+    #     hist = {}
+    #     hist['date'] = data.get('timestamp')
+    #     hist['symbol'] = data.get('meta').get('symbol')
+    #     hist['exchange'] = data.get('meta').get('exchangeName')
+    #     hist['open'] = quotes.get('open')
+    #     hist['low'] = quotes.get('low')
+    #     hist['high'] = quotes.get('high')
+    #     hist['close'] = quotes.get('close')
+    #     # hist['adjclose'] = quotes.get('adjclose')[0].get('adjclose')
+    #     hist['volume'] = quotes.get('volume')
+    #     return hist
+
     def getquotes(self, data):
-        indicators = data.get('indicators')
-        if indicators is None or indicators == '' : return {}
-        quotes = indicators.get('quote')
-        if quotes is None or quotes == '': return {}
-        quotes = quotes[0]
-        hist = {}
-        hist['date'] = data.get('timestamp')
-        hist['symbol'] = data.get('meta').get('symbol')
-        hist['exchange'] = data.get('meta').get('exchangeName')
-        hist['open'] = quotes.get('open')
-        hist['low'] = quotes.get('low')
-        hist['high'] = quotes.get('high')
-        hist['close'] = quotes.get('close')
-        # hist['adjclose'] = quotes.get('adjclose')[0].get('adjclose')
-        hist['volume'] = quotes.get('volume')
-        return hist
+        try:
+            quotes = data.get('indicators').get('quote')[0]
+            if quotes == {}: return {}
+            hist = {}
+            hist['date'] = data.get('timestamp')
+            hist['symbol'] = data.get('meta').get('symbol')
+            hist['exchange'] = data.get('meta').get('exchangeName')
+            hist['open'] = quotes.get('open')
+            hist['low'] = quotes.get('low')
+            hist['high'] = quotes.get('high')
+            hist['close'] = quotes.get('close')
+            # hist['adjclose'] = quotes.get('adjclose')[0].get('adjclose')
+            hist['volume'] = quotes.get('volume')
+            return hist
+        except:
+            return {}
 
     def getdividends(self, data):
         events = data.get('events')
@@ -60,17 +79,15 @@ class HistDataDict(SDLogger):
     def gethistdata(self, symbol, startdt):
         symbol = symbol.upper()
         exchange = 'BSE' if symbol.endswith('.BO') else 'NSE'
-        data = self.getchartresult(symbol, startdt)
-        data = data.get('chart')
-        if data is None or data == '': return {}
-        if data.get('error'):
-            self.msglogger.info(f'no hist price for {symbol}')
-            return {}
-        data = data.get('result')
-        if data is None or data == '': return {}
-        data = data[0]
-        quotes, dividends, splits = self.getquotes(data), self.getdividends(data), self.getsplits(data)
-        if quotes == {}:
-            self.msglogger.info(f'no hist price for {symbol}')
-            return {}
-        return [quotes, dividends, splits]
+        try:
+            data = self.getchartresult(symbol, startdt)
+            data = data.get('chart').get('result')[0]
+            if data == '' or data is None :
+                return [{}, {}, {}]
+            quotes, dividends, splits = self.getquotes(data), self.getdividends(data), self.getsplits(data)
+            if quotes == {}:
+                self.msglogger.info(f'no hist price for {symbol}')
+                return [{}, {}, {}]
+            return [quotes, dividends, splits]
+        except:
+            return [{}, {}, {}]
