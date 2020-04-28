@@ -21,7 +21,7 @@ class SymbolDetails():
             if symbolid == '': return values
             values['symbolid'] = symbolid
             for section in self.terms.keys():
-                api = f'{self.mcpriceapiurl}/{exchange}/{section}/{symbolid}'
+                api = f'{self.mcpriceapiurl}/{exchange.lower()}/{section}/{symbolid}'
                 with requests.Session() as session:
                     session.mount(api, HTTPAdapter(max_retries=self.request_max_retries))
                     response = session.get(api, allow_redirects=False)

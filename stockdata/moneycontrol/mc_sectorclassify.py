@@ -40,11 +40,12 @@ class SectorClassify():
                     df = pd.DataFrame(row_data, columns=['name', 'industry', 'lastprice', 'change', 'changepct', 'mktcap'])
                     df.drop(['change', 'changepct', 'mktcap'], axis=1, inplace=True)
                     df['symbolurl'] = url
-                    df.insert(loc=0, column = 'exchange', value=exchange)
+                    df.insert(loc=0, column = 'exchange', value=exchange.upper())
                     df.insert(loc=1, column = 'sector', value=sector)
                     dfs.append(df)
         df = pd.concat(dfs, ignore_index=True)
         df['symbolurl'] = df['name'].apply(lambda x: x.split('>')[1].replace('/india/stockpricequote/', ''))
         df['symbolcd'] = df['symbolurl'].apply(lambda x: x.split('/')[2])
         df['name'] = df['name'].apply(lambda x: x.split('>')[0])
+        df['sector'] = df['sector'].apply(lambda x: x.replace('consumer-', 'consumer ').title() if x.startswith('consumer') else x.replace('-', ' & ').title())
         return df
