@@ -7,25 +7,6 @@ from ..sdlogger import SDLogger
 
 class HistDataDict(SDLogger):
 
-    # def getquotes(self, data):
-    #     indicators = data.get('indicators')
-    #     if indicators is None or indicators == '' : return {}
-    #     quotes = indicators.get('quote')
-    #     if quotes is None or quotes == '': return {}
-    #     quotes = quotes[0]
-    #     if quotes is None or quotes == '': return {}
-    #     hist = {}
-    #     hist['date'] = data.get('timestamp')
-    #     hist['symbol'] = data.get('meta').get('symbol')
-    #     hist['exchange'] = data.get('meta').get('exchangeName')
-    #     hist['open'] = quotes.get('open')
-    #     hist['low'] = quotes.get('low')
-    #     hist['high'] = quotes.get('high')
-    #     hist['close'] = quotes.get('close')
-    #     # hist['adjclose'] = quotes.get('adjclose')[0].get('adjclose')
-    #     hist['volume'] = quotes.get('volume')
-    #     return hist
-
     def getquotes(self, data):
         try:
             quotes = data.get('indicators').get('quote')[0]

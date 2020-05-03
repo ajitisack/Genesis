@@ -2,6 +2,7 @@ import pandas as pd
 
 from .symbols.getsymbols import Symbols
 from .historicaldata.loadhistdata import HistData
+from .indices.loaddata import Indices
 from .yahoofinance.yf_downloader import YahooFinance
 from .moneycontrol.mc_downloader import MoneyControl
 from .sqlite import SqLite
@@ -22,6 +23,9 @@ def download(startdt='2015-01-01'):
     symbols = Symbols()
     symbols.download()
     del symbols
+    i = Indices()
+    i.loadindicesdata(startdt)
+    del i
     hd = HistData()
     hd.download(n_symbols=0, loadtotable=True, startdt=startdt)
     del hd
@@ -34,6 +38,9 @@ def download(startdt='2015-01-01'):
 
 def downloadsymbols():
     return Symbols().download()
+
+def downloadindices(startdt='2020-01-01'):
+    return Indices().loadindicesdata(startdt)
 
 def downloaddlyhistdata(n_symbols=0, loadtotable=True, startdt='2020-01-01'):
     return HistData().download(n_symbols, loadtotable, startdt)

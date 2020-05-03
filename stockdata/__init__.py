@@ -4,6 +4,7 @@ from .stockdata import loadtotable
 from .stockdata import download
 from .stockdata import downloadsymbols
 from .stockdata import downloaddlyhistdata
+from .stockdata import downloadindices
 
 from .stockdata import downloadsymboldetailsyf
 from .stockdata import downloadsymboldetailsmc

@@ -23,7 +23,7 @@ class HistData(HistDataDict):
 
     def processdf(self, df):
         df['date'] = df['date'].apply(lambda x: arrow.get(x).format('YYYY-MM-DD'))
-        df['symbol'] = df['symbol'].apply(lambda x: x[:-3])
+        df['symbol'] = df['symbol'].apply(lambda x: x.split('.')[0].replace('^', ''))
         df['exchange'] = df['exchange'].apply(lambda x: x.replace('NSI', 'NSE'))
         df = Utility.adddatefeatures(df)
         df = Utility.reducesize(df)
