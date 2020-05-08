@@ -2,6 +2,7 @@ import pandas as pd
 
 from .symbols.getsymbols import Symbols
 from .historicaldata.loadhistdata import HistData
+from .realtimedata.loadrealtimedata import RealTimeData
 from .indices.loaddata import Indices
 from .yahoofinance.yf_downloader import YahooFinance
 from .moneycontrol.mc_downloader import MoneyControl
@@ -35,6 +36,9 @@ def download(startdt='2015-01-01'):
     mc = MoneyControl()
     mc.downloaddetails(n_symbols=0, loadtotable=True)
     del mc
+
+def downloadrealtimedata(n_symbols=0):
+    return RealTimeData().download(n_symbols)
 
 def downloadsymbols():
     return Symbols().download()
