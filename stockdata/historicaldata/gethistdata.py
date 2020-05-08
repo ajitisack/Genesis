@@ -48,7 +48,7 @@ class HistDataDict(SDLogger):
     def getchartresult(self, symbol, startdt):
         params = {}
         params['period1']  = arrow.get(startdt).timestamp
-        params['period2']  = arrow.now().timestamp
+        params['period2']  = arrow.now().shift(days=1).timestamp
         params['interval'] = '1d'
         params['events']   = 'history,div,split'
         url = f'{self.yfqueryurl}/{symbol}'
@@ -59,7 +59,7 @@ class HistDataDict(SDLogger):
 
     def gethistdata(self, symbol, startdt):
         symbol = symbol.upper()
-        exchange = 'BSE' if symbol.endswith('.BO') else 'NSE'
+        # exchange = 'BSE' if symbol.endswith('.BO') else 'NSE'
         try:
             data = self.getchartresult(symbol, startdt)
             data = data.get('chart').get('result')[0]

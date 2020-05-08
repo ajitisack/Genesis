@@ -7,3 +7,6 @@ def addIndicators(df):
 
 def addMA(df, n):
     return Indicators().MA(df, n)
+
+def addEMA(df, n):
+    return Indicators().EsssMA(df, n)

@@ -21,7 +21,7 @@ class Indicators(Config, TrendIndicators):
 
     def createIndicators(self, df):
         self.getIndicators()
-        print(self.indicators)
+        # print(self.indicators)
         for indicators in self.indicators:
             func = indicators[0]
             func_param = indicators[1]
