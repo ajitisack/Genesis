@@ -15,8 +15,9 @@ class HistData(HistDataDict):
         Config.__init__(self)
 
     @SqLite.connector
-    def getsymbols(self, n_symbols):
-        query = f"select symbol || '.NS' as symbol from symbols where innse = 1 union all select symbol || '.BO' as symbol from symbols where inbse = 1 "
+    def getsymbols(self, exchange, n_symbols):
+        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from symbols where innse = 1 "
+        if exchange == 'BSE': query = f"select symbol || '.BO' as symbol from symbols where inbse = 1 "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)
@@ -30,9 +31,13 @@ class HistData(HistDataDict):
         return df
 
     @Utility.timer
-    def download(self, n_symbols, loadtotable, startdt):
-        symbols = self.getsymbols(n_symbols)
-        print(f'Downloading historical prices and actions from yahoo finance for {len(symbols)} symbols from {startdt}', end='...', flush=True)
+    def download(self, exchange, n_symbols, loadtotable, startdt):
+        symbols = self.getsymbols(exchange, n_symbols)
+        if exchange == 'NSE': tbl_hprice  = self.tbl_nsehprice
+        if exchange == 'NSE': tbl_actions = self.tbl_nseactions
+        if exchange == 'BSE': tbl_hprice  = self.tbl_bsehprice
+        if exchange == 'BSE': tbl_actions = self.tbl_bseactions
+        print(f'Downloading historical prices and actions from yahoo finance for {len(symbols)} {exchange.upper()} symbols from {startdt}', end='...', flush=True)
         nthreads = min(len(symbols), int(self.maxthreads))
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
             results = executor.map(self.gethistdata, symbols, repeat(startdt))
@@ -48,7 +53,7 @@ class HistData(HistDataDict):
         histprice = histprice.astype({'volume': int})
         print('Completed!')
         if not loadtotable: return histprice, actions
-        SqLite.loadtable(histprice, self.tbl_hpricedly)
-        SqLite.createindex(self.tbl_hpricedly, 'symbol')
-        SqLite.loadtable(actions, self.tbl_actions)
-        SqLite.createindex(self.tbl_actions, 'symbol')
+        SqLite.loadtable(histprice, tbl_hprice)
+        SqLite.createindex(tbl_hprice, 'symbol')
+        SqLite.loadtable(actions, tbl_actions)
+        SqLite.createindex(tbl_actions, 'symbol')

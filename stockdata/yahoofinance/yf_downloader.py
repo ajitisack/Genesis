@@ -14,16 +14,21 @@ class YahooFinance(Config, SymbolDetails):
         self.details_items = self.getitems()
 
     @SqLite.connector
-    def getsymbols(self, n_symbols):
-        query = f"select symbol || '.NS' as symbol from symbols where innse = 1 union all select symbol || '.BO' as symbol from symbols where inbse = 1 "
+    def getsymbols(self, exchange, n_symbols):
+        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from symbols where innse = 1 "
+        if exchange == 'BSE': query = f"select symbol || '.BO' as symbol from symbols where inbse = 1 "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)
 
     @Utility.timer
-    def downloaddetails(self, n_symbols, loadtotable):
-        symbols = self.getsymbols(n_symbols)
-        print(f'Downloading details and esg scores of {len(symbols)} symbols from Yahoo Finance', end='...', flush=True)
+    def downloaddetails(self, exchange, n_symbols, loadtotable):
+        symbols = self.getsymbols(exchange.upper(), n_symbols)
+        if exchange == 'NSE': tbl_details   = self.tbl_nsesecdtls
+        if exchange == 'NSE': tbl_esgscores = self.tbl_nseesg
+        if exchange == 'BSE': tbl_details   = self.tbl_bsesecdtls
+        if exchange == 'BSE': tbl_esgscores = self.tbl_bseesg
+        print(f'Downloading details and esg scores of {len(symbols)} {exchange.upper()} symbols from Yahoo Finance', end='...', flush=True)
         nthreads = min(len(symbols), int(self.maxthreads))
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
             results = executor.map(self.getdetails, symbols)
@@ -39,7 +44,8 @@ class YahooFinance(Config, SymbolDetails):
         df     = Utility.reducesize(df)
         df_esg = Utility.reducesize(df_esg)
         if not loadtotable: return df, df_esg
-        SqLite.loadtable(df, self.tbl_secdetails)
-        SqLite.createindex(self.tbl_secdetails, 'symbol')
-        SqLite.loadtable(df_esg, self.tbl_esgdetail)
-        SqLite.createindex(self.tbl_esgdetail, 'symbol')
+        SqLite.loadtable(df, tbl_details)
+        SqLite.createindex(tbl_details, 'symbol')
+        if not df_esg.empty :
+            SqLite.loadtable(df_esg, tbl_esgscores)
+            SqLite.createindex(tbl_esgscores, 'symbol')

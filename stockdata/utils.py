@@ -20,14 +20,25 @@ class Utility():
 
     @staticmethod
     def adddatefeatures(df):
-        df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
-        df['year'] = df['date'].dt.year
+        df['date']  = pd.to_datetime(df['date'], format='%Y-%m-%d')
+        df['year']  = df['date'].dt.year
         df['month'] = df['date'].dt.month
-        df['day'] = df['date'].dt.day
+        df['day']   = df['date'].dt.day
         df['wkday'] = df['date'].dt.dayofweek + 1
-        df['wknr'] = df['date'].dt.week
-        df['qrtr'] = df['date'].dt.quarter
-        df['date'] = df['date'].dt.date
+        df['wknr']  = df['date'].dt.week
+        df['qrtr']  = df['date'].dt.quarter
+        df['date']  = df['date'].dt.date
+        return df
+
+    @staticmethod
+    def addtimefeatures(df):
+        df['year']  = df['time'].dt.year
+        df['month'] = df['time'].dt.month
+        df['day']   = df['time'].dt.day
+        df['wkday'] = df['time'].dt.dayofweek + 1
+        df['wknr']  = df['time'].dt.week
+        df['qrtr']  = df['time'].dt.quarter
+        df['date']  = df['time'].dt.date
         return df
 
     @staticmethod

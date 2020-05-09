@@ -27,3 +27,14 @@ class Indicators(Config, TrendIndicators):
             func_param = indicators[1]
             exec(f'df = self.{func}(df, {func_param})')
         return df
+
+# EWMA
+# n = 3
+# weights= list(reversed([(n - i) * n for i in range(n)]))
+#
+# def wma(w):
+#     def g(x):
+#         return sum(w*x)/sum(w)
+#     return g
+#
+# x.close.rolling(n).apply(wma(weights))

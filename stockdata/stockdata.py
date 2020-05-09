@@ -20,7 +20,7 @@ def loadtotable(df, tblname):
     df = Utility.reducesize(df)
     SqLite.loadtable(df, tblname)
 
-def download(startdt='2015-01-01'):
+def downloadhistdata(startdt='2015-01-01'):
     symbols = Symbols()
     symbols.download()
     del symbols
@@ -28,17 +28,30 @@ def download(startdt='2015-01-01'):
     i.loadindicesdata(startdt)
     del i
     hd = HistData()
-    hd.download(n_symbols=0, loadtotable=True, startdt=startdt)
+    hd.download('NSE', n_symbols=0, loadtotable=True, startdt=startdt)
+    hd.download('BSE', n_symbols=0, loadtotable=True, startdt=startdt)
     del hd
-    yf = YahooFinance()
-    yf.downloaddetails(n_symbols=0, loadtotable=True)
-    del yf
+
+def downloadrealtimedata():
+    rt = RealTimeData()
+    rt.download('NSE', n_symbols=0, loadtotable=True)
+    rt.download('BSE', n_symbols=0, loadtotable=True)
+    del rt
+
+def downloadprofile():
     mc = MoneyControl()
     mc.downloaddetails(n_symbols=0, loadtotable=True)
     del mc
+    yf = YahooFinance()
+    yf.downloaddetails('NSE', n_symbols=0, loadtotable=True)
+    yf.downloaddetails('BSE', n_symbols=0, loadtotable=True)
+    del yf
 
-def downloadrealtimedata(n_symbols=0):
-    return RealTimeData().download(n_symbols)
+def downloadnserealtimedata(n_symbols=0, loadtotable=True):
+    return RealTimeData().download('NSE', n_symbols, loadtotable)
+
+def downloadbserealtimedata(n_symbols=0, loadtotable=True):
+    return RealTimeData().download('BSE', n_symbols, loadtotable)
 
 def downloadsymbols():
     return Symbols().download()
@@ -46,11 +59,17 @@ def downloadsymbols():
 def downloadindices(startdt='2020-01-01'):
     return Indices().loadindicesdata(startdt)
 
-def downloaddlyhistdata(n_symbols=0, loadtotable=True, startdt='2020-01-01'):
-    return HistData().download(n_symbols, loadtotable, startdt)
+def downloadnsehistdata(n_symbols=0, loadtotable=True, startdt='2020-01-01'):
+    return HistData().download('NSE', n_symbols, loadtotable, startdt)
 
-def downloadsymboldetailsyf(n_symbols=0, loadtotable=True):
-    return YahooFinance().downloaddetails(n_symbols, loadtotable)
+def downloadbsehistdata(n_symbols=0, loadtotable=True, startdt='2020-01-01'):
+    return HistData().download('BSE', n_symbols, loadtotable, startdt)
+
+def downloadnsesymboldetailsyf(n_symbols=0, loadtotable=True):
+    return YahooFinance().downloaddetails('NSE', n_symbols, loadtotable)
+
+def downloadbsesymboldetailsyf(n_symbols=0, loadtotable=True):
+    return YahooFinance().downloaddetails('BSE', n_symbols, loadtotable)
 
 def downloadsymboldetailsmc(n_symbols=0, loadtotable=True):
     return MoneyControl().downloaddetails(n_symbols, loadtotable)

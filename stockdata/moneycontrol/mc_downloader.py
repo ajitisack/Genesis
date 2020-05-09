@@ -34,7 +34,6 @@ class MoneyControl(SDLogger, Config, SectorClassify, SymbolDetails):
     def downloaddetails(self, n_symbols, loadtotable):
         x = 'all' if n_symbols == 0 else n_symbols
         print(f'Downloading details of {x} symbols from Money Control', end='...', flush=True)
-        tblname = self.tbl_mcprofile
         df1 = self.getsectorclassif()
         if n_symbols > 0: df1 = df1.head(n_symbols)
         symbols = zip(df1.exchange, df1.symbolurl)
@@ -46,4 +45,7 @@ class MoneyControl(SDLogger, Config, SectorClassify, SymbolDetails):
         df = Utility.reducesize(df)
         print('Completed')
         if not loadtotable: return df
-        SqLite.loadtable(df, tblname)
+        df_nse = df.query("exchange == 'NSE'")
+        df_bse = df.query("exchange == 'BSE'")
+        SqLite.loadtable(df_nse, self.tbl_nsemcprofile)
+        SqLite.loadtable(df_bse, self.tbl_bsemcprofile)
