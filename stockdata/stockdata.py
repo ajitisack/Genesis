@@ -2,7 +2,7 @@ import pandas as pd
 
 from .symbols.getsymbols import Symbols
 from .historicaldata.loadhistdata import HistData
-from .realtimedata.loadrealtimedata import RealTimeData
+from .intradaydata.downloadintradaydata import IntraDayData
 from .indices.loaddata import Indices
 from .yahoofinance.yf_downloader import YahooFinance
 from .moneycontrol.mc_downloader import MoneyControl
@@ -32,11 +32,11 @@ def downloadhistdata(startdt='2015-01-01'):
     hd.download('BSE', n_symbols=0, loadtotable=True, startdt=startdt)
     del hd
 
-def downloadrealtimedata():
-    rt = RealTimeData()
-    rt.download('NSE', n_symbols=0, loadtotable=True)
-    rt.download('BSE', n_symbols=0, loadtotable=True)
-    del rt
+def downloadintradaydata(date):
+    id = IntraDayData()
+    id.download('NSE', date, n_symbols=0)
+    id.download('BSE', date, n_symbols=0)
+    del id
 
 def downloadprofile():
     mc = MoneyControl()
@@ -47,11 +47,11 @@ def downloadprofile():
     yf.downloaddetails('BSE', n_symbols=0, loadtotable=True)
     del yf
 
-def downloadnserealtimedata(n_symbols=0, loadtotable=True):
-    return RealTimeData().download('NSE', n_symbols, loadtotable)
+def downloadnseintradaydata(date, n_symbols=0):
+    return IntraDayData().download('NSE', date, n_symbols)
 
-def downloadbserealtimedata(n_symbols=0, loadtotable=True):
-    return RealTimeData().download('BSE', n_symbols, loadtotable)
+def downloadbseintradaydata(date, n_symbols=0):
+    return IntraDayData().download('BSE', date, n_symbols)
 
 def downloadsymbols():
     return Symbols().download()

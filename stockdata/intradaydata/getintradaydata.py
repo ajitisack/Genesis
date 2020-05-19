@@ -3,7 +3,9 @@ import requests
 import arrow
 from requests.adapters import HTTPAdapter
 
-class RealTimeDataDict():
+from ..config import Config
+
+class IntraDayDataDict(Config):
 
     def getquotes(self, data):
         try:
@@ -12,7 +14,7 @@ class RealTimeDataDict():
             hist = {}
             hist['timestamp'] = data.get('timestamp')
             hist['symbol'] = data.get('meta').get('symbol')
-            hist['exchange'] = data.get('meta').get('exchangeName')
+            # hist['exchange'] = data.get('meta').get('exchangeName')
             hist['open'] = quotes.get('open')
             hist['low'] = quotes.get('low')
             hist['high'] = quotes.get('high')
@@ -22,11 +24,11 @@ class RealTimeDataDict():
         except:
             return {}
 
-    def getchartresult(self, symbol, startdt, enddt):
+    def getchartresult(self, symbol, date):
         try:
             params = {}
-            params['period1']  = startdt.timestamp
-            params['period2']  = enddt.timestamp
+            params['period1']  = arrow.get(date).timestamp
+            params['period2']  = arrow.get(date).shift(days=1).timestamp
             params['interval'] = '1m'
             url = f'{self.yfqueryurl}/{symbol}'
             with requests.Session() as session:
@@ -37,14 +39,9 @@ class RealTimeDataDict():
         except:
             return None
 
-    def getrealtimedata(self, symbol):
+    def getintradaydata(self, symbol, date):
         quotes = []
         symbol = symbol.upper()
-        startdt = arrow.now().to('local').shift(days=-29)
-        while startdt <= arrow.now():
-            enddt = startdt.shift(days=7)
-            # print(f"Range -> {startdt.format('YYYY-MM-DD')} - {enddt.format('YYYY-MM-DD')}")
-            data = self.getchartresult(symbol, startdt, enddt)
-            quotes.append(self.getquotes(data))
-            startdt = enddt
+        data = self.getchartresult(symbol, date)
+        quotes = self.getquotes(data)
         return quotes
