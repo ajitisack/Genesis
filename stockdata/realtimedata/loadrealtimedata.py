@@ -22,10 +22,10 @@ class RealTimeData(RealTimeDataDict):
         return list(df.symbol)
 
     def processdf(self, df):
-        df['time'] = df['time'].apply(lambda x: arrow.get(x).to('local').format('YYYY-MM-DD hh:mm:SS A'))
+        df['timestamp'] = df['timestamp'].apply(lambda x: arrow.get(x).to('local').format('YYYY-MM-DD HH:mm'))
         df['exchange'] = df['symbol'].apply(lambda x: 'BSE' if x.split('.')[1] == 'BO' else 'NSE')
         df['symbol'] = df['symbol'].apply(lambda x: x.split('.')[0].replace('^', ''))
-        # df = Utility.addtimefeatures(df)
+        df = Utility.addtimefeatures(df)
         df = Utility.reducesize(df)
         return df
 
@@ -40,8 +40,9 @@ class RealTimeData(RealTimeDataDict):
             results = executor.map(self.getrealtimedata, symbols)
         values = list(results)
         dfs = [pd.DataFrame(d) for lst in values for d in lst]
-        df = pd.concat(dfs, ignore_index=True)
+        df = pd.concat(dfs, ignore_index=True).dropna()
         df = self.processdf(df)
+        df = df.astype({'volume': int})
         print('Completed!')
         if not loadtotable: return df
         SqLite.loadtable(df, tbl_rtprice)

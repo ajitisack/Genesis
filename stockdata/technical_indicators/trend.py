@@ -9,11 +9,11 @@ class TrendIndicators():
     def MA(self, df, n):
         name=f'ma{n}d'
         x = df.close.rolling(n).mean().fillna(0)
-        df[name] = x
+        df[name] = round(x,2)
         return df
 
     def EMA(self, df, n):
         name=f'ema{n}d'
         x = df.close.ewm(span=n, adjust=False).mean().fillna(0)
-        df[name] = x
+        df[name] = round(x,2)
         return df

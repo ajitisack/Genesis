@@ -10,7 +10,7 @@ class RealTimeDataDict():
             quotes = data.get('indicators').get('quote')[0]
             if quotes == {}: return {}
             hist = {}
-            hist['time'] = data.get('timestamp')
+            hist['timestamp'] = data.get('timestamp')
             hist['symbol'] = data.get('meta').get('symbol')
             hist['exchange'] = data.get('meta').get('exchangeName')
             hist['open'] = quotes.get('open')

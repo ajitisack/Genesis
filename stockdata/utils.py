@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import functools
 import time
+import datetime
 
 class Utility():
 
@@ -31,14 +32,28 @@ class Utility():
         return df
 
     @staticmethod
+    def hoursbinning(t):
+        if t >= datetime.time(15,0) : return 7
+        if t > datetime.time(14,0)  : return 6
+        if t > datetime.time(13,0)  : return 5
+        if t > datetime.time(12,0)  : return 4
+        if t > datetime.time(11,0)  : return 3
+        if t > datetime.time(10,0)  : return 2
+        return 1
+
+    @staticmethod
     def addtimefeatures(df):
-        df['year']  = df['time'].dt.year
-        df['month'] = df['time'].dt.month
-        df['day']   = df['time'].dt.day
-        df['wkday'] = df['time'].dt.dayofweek + 1
-        df['wknr']  = df['time'].dt.week
-        df['qrtr']  = df['time'].dt.quarter
-        df['date']  = df['time'].dt.date
+        df['timestamp']  = pd.to_datetime(df['timestamp'], format='%Y-%m-%d %H:%M')
+        df['date']    = df['timestamp'].dt.date
+        df['year']    = df['timestamp'].dt.year
+        df['month']   = df['timestamp'].dt.month
+        df['day']     = df['timestamp'].dt.day
+        df['wkday']   = df['timestamp'].dt.dayofweek + 1
+        df['wknr']    = df['timestamp'].dt.week
+        df['qrtr']    = df['timestamp'].dt.quarter
+        df['time']    = df['timestamp'].dt.time
+        df['after12'] = df['time'].apply(lambda x: 1 if x >= datetime.time(12,0) else 0)
+        df['dayhour'] = df['time'].apply(lambda x: Utility.hoursbinning(x))
         return df
 
     @staticmethod

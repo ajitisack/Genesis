@@ -46,10 +46,8 @@ class HistData(HistDataDict):
         dividends = pd.concat([pd.DataFrame(i[1]) for i in values], ignore_index=True)
         splits    = pd.concat([pd.DataFrame(i[2]) for i in values], ignore_index=True)
         actions   = pd.concat([dividends, splits], ignore_index=True)
-        histprice = self.processdf(histprice)
-        actions   = self.processdf(actions)
-        histprice = histprice.dropna()
-        actions = actions.dropna()
+        histprice = self.processdf(histprice).dropna()
+        actions   = self.processdf(actions).dropna()
         histprice = histprice.astype({'volume': int})
         print('Completed!')
         if not loadtotable: return histprice, actions
