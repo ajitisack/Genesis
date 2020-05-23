@@ -23,7 +23,7 @@ class IntraDayData(IntraDayDataDict):
         return list(df.symbol)
 
     def processdf(self, df):
-        df['timestamp'] = df['timestamp'].apply(lambda x: arrow.get(x).to('local').format('YYYY-MM-DD HH:mm'))
+        # df['timestamp'] = df['timestamp'].apply(lambda x: arrow.get(x).to('local').format('YYYY-MM-DD HH:mm'))
         # df['exchange'] = df['symbol'].apply(lambda x: 'BSE' if x.split('.')[1] == 'BO' else 'NSE')
         df['symbol'] = df['symbol'].apply(lambda x: x.split('.')[0].replace('^', ''))
         # df = Utility.addtimefeatures(df)
@@ -40,8 +40,11 @@ class IntraDayData(IntraDayDataDict):
         values = list(results)
         dfs = [pd.DataFrame(d) for d in values]
         df = pd.concat(dfs, ignore_index=True).dropna()
+        if df.empty:
+            print('No data !')
+            return None
         df = self.processdf(df)
         df = df.astype({'volume': int})
-        file = f"{exchange}_{date.replace('-','')}.txt"
+        file = f"{self.intraday_dir}\\{exchange}_{date.replace('-','')}.txt"
         df.to_csv(file, index=False)
         print('Completed!')

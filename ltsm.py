@@ -5,70 +5,53 @@ from math import sqrt
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
+from keras.preprocessing.sequence import TimeseriesGenerator
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM
 
 df = sd.getdata("select date, close from nsehistprice where symbol = 'INDUSINDBK'")
-df
 
-df.shape
+# Using Train and Test
 
-X  = df.close.values.reshape(-1,1)
-X1 = df.close.shift(1).values.reshape(-1,1)
+df['date'] = pd.to_datetime(df.date)
+df.set_index('date', inplace=True)
 
-X  = X[1:]
-X1 = X1[1:]
+n_test_days = 5
+train, test = df[:-n_test_days], df[-n_test_days:]
 
-len(X)
-len(X1)
+len(train)
+len(test)
 
-X[1:5]
+scaler = MinMaxScaler()
+xtrain = scaler.fit_transform(train)
+xtest  = scaler.fit_transform(test)
 
-X1[1:5]
-
-scaler = MinMaxScaler(feature_range=(0, 1))
-X  = scaler.fit_transform(X)
-X1 = scaler.fit_transform(X1)
-
-len(X)
-len(X1)
-
-n = 4200
-train_X, train_Y = X[:n], X1[:n]
-test_X,  test_Y  = X[n+1:], X1[n+1:]
-
-len(train_X)
-len(train_Y)
-len(test_X)
-len(test_Y)
-
-train_X
-
-train_X.shape
-test_X.shape
-np.reshape(train_X, (train_X.shape[0], 1, train_X.shape[1]))
-
-train_X = np.reshape(train_X, (train_X.shape[0], 1, train_X.shape[1]))
-test_X  = np.reshape(test_X, (test_X.shape[0], 1, test_X.shape[1]))
-
+n_input    = 1
+n_features = 1
+xtrain = TimeseriesGenerator(xtrain, xtrain, length=n_input, batch_size=1)
+xtest  = TimeseriesGenerator(xtest, xtest, length=n_input, batch_size=1)
 
 model = Sequential()
-model.add(LSTM(4, input_shape=(1, 1)))
+model.add(LSTM(100, activation='relu', input_shape=(n_input, n_features)))
 model.add(Dense(1))
-model.compile(loss='mean_squared_error', optimizer='adam')
-model.fit(train_X, train_Y, epochs=5, batch_size=1, verbose=2)
+model.compile(optimizer='adam', loss='mean_squared_error')
 
-df.head()
-
-train_X
-test_X[1]
+model.fit_generator(xtrain, epochs=10, verbose=2)
 
 
-testPredict = model.predict(test_X)
-testPredict = scaler.inverse_transform(testPredict)
-rmse = sqrt(mean_squared_error(df.close[n:n+211], testPredict))
-print('Test Score: %.2f RMSE' % (rmse))
+preds = model.predict(xtest)
+preds = np.round(scaler.inverse_transform(preds),2)
+test['pred_close'] = np.append(preds, 0)
 
-abc = df[['date', 'close']][n:n+211]
-abc['predicted'] = testPredict
-abc.plot()
+
+# Predict Test incrementally
+pred_list = []
+batch = xtrain[-n_input:]
+for i in range(n_test_days):
+    batch = batch.reshape((1, n_input, n_features))
+    pred_val = model.predict(batch)[0]
+    pred_list.append(pred_val)
+    batch = pred_val
+test['sequence_pred'] = np.round(scaler.inverse_transform(pred_list), 2)
+
+test
