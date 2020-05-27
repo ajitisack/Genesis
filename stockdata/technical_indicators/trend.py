@@ -8,7 +8,7 @@ class TrendIndicators():
 
     def MA(self, df, n):
         name=f'ma{n}d'
-        df[name] = df.groupby('symbol').close.transform(lambda x: x.rolling(5).mean().fillna(0).round(2))
+        df[name] = df.groupby('symbol').close.transform(lambda x: x.rolling(n).mean().fillna(0).round(2))
         return df
 
     def EMA(self, df, n):

@@ -14,7 +14,8 @@ from .stockdata import downloadbseintradaydata
 
 from .stockdata import downloadnsesymboldetailsyf
 from .stockdata import downloadbsesymboldetailsyf
-from .stockdata import downloadsymboldetailsmc
+from .stockdata import downloadnsesymboldetailsmc
+from .stockdata import downloadbsesymboldetailsmc
 from .stockdata import downloadsectorclassify
 
 from .techindicators import addIndicators

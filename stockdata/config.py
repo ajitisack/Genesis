@@ -11,4 +11,4 @@ class Config():
         for section in cp.sections():
             for k,v in cp.items(section):
                 # print(f"self.{k} = '{v}'")
-                exec(f"self.{k} = '{v}'")
+                exec(f"self.{k} = r'{v}'")

@@ -1,7 +1,4 @@
-import requests as requests
-import pandas as pd
 import json
-import arrow
 import re
 import requests
 from requests.adapters import HTTPAdapter
@@ -20,24 +17,27 @@ class SymbolDetails():
                 x.append((key, line))
         return x
 
-    def getquotejson(self, symbol):
-        url = f'{self.yfquoteurl}/{symbol}'
+    def getquotesummary(self, symbol):
+        url = f'{self.yfquoteurl}/{symbol}?modules=defaultKeyStatistics,details,summaryProfile,recommendationTrend,financialsTemplate,earnings,price,financialData,quoteType,calendarEvents,summaryDetail,symbol,esgScores,upgradeDowngradeHistory,pageViews'
         with requests.Session() as session:
             session.mount(url, HTTPAdapter(max_retries=self.request_max_retries))
             response = session.get(url)
-        if 'QuoteSummaryStore' not in response.text:
-            return {}
-        json_str = response.text.split('root.App.main =')[1].split('(this)')[0].split(';\n}')[0].strip()
-        data = json.loads(json_str)['context']['dispatcher']['stores']['QuoteSummaryStore']
-        new_data = json.dumps(data).replace('{}', 'null')
-        new_data = re.sub(r'\{[\'|\"]raw[\'|\"]:(.*?),(.*?)\}', r'\1', new_data)
-        return json.loads(new_data)
+        json_str = json.loads(response.text).get('quoteSummary').get('result')[0]
+        return json_str
+
+    def getitemvalue(self, json_str, section, item):
+        try:
+            value = json_str.get(section).get(item) or ''
+            value = value.get('raw') if type(value) == dict else value
+        except:
+            value = ''
+        return value
 
     def getdetails(self, symbol):
         exchange = 'BSE' if symbol.endswith('.BO') else 'NSE'
         details = {'symbol' : symbol[:-3], 'exchange' : exchange}
-        json_str = self.getquotejson(symbol)
-        for section, item in self.details_items:
-            attrib = json_str.get(section)
-            details[item.lower()] = attrib.get(item) if attrib else ''
+        json_str = self.getquotesummary(symbol)
+        if json_str:
+            for section, item in self.details_items:
+                details[item.lower()] = self.getitemvalue(json_str, section, item)
         return details

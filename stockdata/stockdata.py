@@ -2,7 +2,7 @@ import pandas as pd
 
 from .symbols.getsymbols import Symbols
 from .historicaldata.loadhistdata import HistData
-from .intradaydata.downloadintradaydata import IntraDayData
+from .intraday.downloadintradaydata import IntraDayData
 from .indices.loaddata import Indices
 from .yahoofinance.yf_downloader import YahooFinance
 from .moneycontrol.mc_downloader import MoneyControl
@@ -71,8 +71,11 @@ def downloadnsesymboldetailsyf(n_symbols=0, loadtotable=True):
 def downloadbsesymboldetailsyf(n_symbols=0, loadtotable=True):
     return YahooFinance().downloaddetails('BSE', n_symbols, loadtotable)
 
-def downloadsymboldetailsmc(n_symbols=0, loadtotable=True):
-    return MoneyControl().downloaddetails(n_symbols, loadtotable)
+def downloadbsesymboldetailsmc(n_symbols=0, loadtotable=True):
+    return MoneyControl().downloaddetails('BSE', n_symbols, loadtotable)
+
+def downloadnsesymboldetailsmc(n_symbols=0, loadtotable=True):
+    return MoneyControl().downloaddetails('NSE', n_symbols, loadtotable)
 
 def downloadsectorclassify():
     return MoneyControl().getsectorclassif()

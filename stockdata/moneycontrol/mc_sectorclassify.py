@@ -2,6 +2,9 @@
 # https://www.moneycontrol.com/stocks/marketstats/sector-scan/nse/today.html
 # https://priceapi-aws.moneycontrol.com/pricefeed/bse/equitycash/BGW
 # https://priceapi-aws.moneycontrol.com/pricefeed/nse/equitycash/BGW
+
+# this is not used in download as it doesn't contain all symbols of NSE and BSE classified in sector-classification page in moneycontrol.com
+
 import requests
 import json
 import pandas as pd

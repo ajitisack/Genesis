@@ -20,7 +20,9 @@ class Indices(HistData):
     def getmcdata(self, params):
         try:
             exchange, type, name, url = params
-            html = requests.get(url).text
+            with requests.Session() as session:
+                session.mount(url, HTTPAdapter(max_retries=self.request_max_retries))
+                html = session.get(url).text
             tree = HTMLParser(html)
             for tag in tree.css('script') + tree.css('style'): tag.decompose()
             data = []
@@ -29,9 +31,11 @@ class Indices(HistData):
                 text = node.text()
                 if text == 'SENSEX': break
                 data.append(text)
-            n = 8
+                if 'href' in node.html:
+                    data.append(node.child.child.attributes['href'].split('/')[-1])
+            n = 9
             df = pd.DataFrame([data[x:x+n] for x in range(0, len(data), n)])
-            df.columns = ['company', 'ltp', 'pctchange', 'volume', 'buyprice', 'sellprice', 'buyqty', 'sellqty']
+            df.columns = ['company', 'code', 'ltp', 'pctchange', 'volume', 'buyprice', 'sellprice', 'buyqty', 'sellqty']
             df.insert(loc=0, column = 'exchange', value=exchange)
             df.insert(loc=1, column = 'type', value=type)
             df.insert(loc=2, column = 'name', value=name)
@@ -69,7 +73,7 @@ class Indices(HistData):
     @Utility.timer
     def loadindicesdata(self, startdt):
         print(f'Downloading details and historical prices of BSE and NSE Indices from {startdt}', end='...', flush=True)
-        df_indices = pd.read_excel(self.indices_file)
+        df_indices = pd.read_csv(self.indices_file)
         indices = list(zip(df_indices.exchange, df_indices.type, df_indices.name, df_indices.mcurl))
         symbols = list(df_indices.symbol)
         indices = self.loadindicesdetails(indices)

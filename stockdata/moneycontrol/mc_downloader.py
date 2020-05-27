@@ -1,14 +1,14 @@
 import pandas as pd
+from itertools import repeat
 from concurrent.futures import ThreadPoolExecutor
 
-from .mc_sectorclassify import SectorClassify
 from .mc_symboldetails import SymbolDetails
 from ..config import Config
 from ..sqlite import SqLite
 from ..utils import Utility
 from ..sdlogger import SDLogger
 
-class MoneyControl(SDLogger, Config, SectorClassify, SymbolDetails):
+class MoneyControl(SDLogger, Config, SymbolDetails):
 
     def __init__(self):
         self.nodatalist = []
@@ -30,22 +30,28 @@ class MoneyControl(SDLogger, Config, SectorClassify, SymbolDetails):
                     items[key][k] = v
         return items
 
+    @SqLite.connector
+    def getsymbols(self, exchange, n_symbols):
+        if exchange == 'NSE': query = f"select isin from symbols where innse = 1 "
+        if exchange == 'BSE': query = f"select isin from symbols where inbse = 1 "
+        if n_symbols > 0: query += f'limit {n_symbols}'
+        df = pd.read_sql(query, SqLite.conn)
+        return list(df['isin'])
+
     @Utility.timer
-    def downloaddetails(self, n_symbols, loadtotable):
-        x = 'all' if n_symbols == 0 else n_symbols
-        print(f'Downloading details of {x} symbols from Money Control', end='...', flush=True)
-        df1 = self.getsectorclassif()
-        if n_symbols > 0: df1 = df1.head(n_symbols)
-        symbols = zip(df1.exchange, df1.symbolurl)
-        nthreads = min(len(df1), int(self.maxthreads))
+    def downloaddetails(self, exchange, n_symbols, loadtotable):
+        if exchange == 'NSE': tbl_mcprofile = self.tbl_nsemcprofile
+        if exchange == 'BSE': tbl_mcprofile = self.tbl_bsemcprofile
+        isins = self.getsymbols(exchange.upper(), n_symbols)
+        print(f'Downloading details of {len(isins)} {exchange} symbols from Money Control', end='...', flush=True)
+        df = pd.read_csv(self.mcurlsfile)
+        df = df[df['isin'].isin(isins)]
+        params = zip(df['isin'], df['symbolid'], df['symbolcd'])
+        nthreads = min(df.shape[0], int(self.maxthreads))
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
-            results = executor.map(self.getsymboldetails, symbols)
-        df2 = pd.DataFrame(results)
-        df = pd.merge(df1, df2, how='left', on=['symbolcd', 'exchange'])
+            results = executor.map(self.getsymboldetails, params, repeat(exchange))
+        df = pd.DataFrame(results)
         df = Utility.reducesize(df)
         print('Completed')
         if not loadtotable: return df
-        df_nse = df.query("exchange == 'NSE'")
-        df_bse = df.query("exchange == 'BSE'")
-        SqLite.loadtable(df_nse, self.tbl_nsemcprofile)
-        SqLite.loadtable(df_bse, self.tbl_bsemcprofile)
+        SqLite.loadtable(df, tbl_mcprofile)
