@@ -3,13 +3,13 @@ import arrow
 from itertools import repeat
 from concurrent.futures import ThreadPoolExecutor
 
-from .gethistdata import HistDataDict
-from ..config import Config
-from ..sqlite import SqLite
-from ..utils import Utility
+from stockdata.historicaldata.gethistdata import HistDataDict
+from stockdata.config import Config
+from stockdata.sqlite import SqLite
+from stockdata.utils import Utility
 
 
-class HistData(HistDataDict):
+class HistData(HistDataDict, Config):
 
     def __init__(self):
         Config.__init__(self)

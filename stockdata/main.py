@@ -1,13 +1,13 @@
 import pandas as pd
 
-from .symbols.getsymbols import Symbols
-from .historicaldata.loadhistdata import HistData
-from .intraday.downloadintradaydata import IntraDayData
-from .indices.loaddata import Indices
-from .yahoofinance.yf_downloader import YahooFinance
-from .moneycontrol.mc_downloader import MoneyControl
-from .sqlite import SqLite
-from .utils import Utility
+from stockdata.symbols.getsymbols import Symbols
+from stockdata.historicaldata.loadhistdata import HistData
+from stockdata.intraday.downloadintradaydata import IntraDayData
+from stockdata.indices.loaddata import Indices
+from stockdata.yahoofinance.yf_downloader import YahooFinance
+from stockdata.moneycontrol.mc_downloader import MoneyControl
+from stockdata.sqlite import SqLite
+from stockdata.utils import Utility
 
 
 @SqLite.connector

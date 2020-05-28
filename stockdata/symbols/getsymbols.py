@@ -6,12 +6,12 @@ import re
 import requests
 from collections import defaultdict
 
-from ..utils import Utility
-from ..sdlogger import SDLogger
-from ..config import Config
-from ..sqlite import SqLite
+from stockdata.utils import Utility
+from stockdata.sdlogger import SDLogger
+from stockdata.config import Config
+from stockdata.sqlite import SqLite
 
-class Symbols(SDLogger):
+class Symbols(SDLogger, Config):
 
     def __init__(self):
         Config.__init__(self)

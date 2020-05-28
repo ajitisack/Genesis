@@ -3,9 +3,7 @@ import requests
 import arrow
 from requests.adapters import HTTPAdapter
 
-from ..config import Config
-
-class IntraDayDataDict(Config):
+class IntraDayDataDict():
 
     def getquotes(self, data):
         try:

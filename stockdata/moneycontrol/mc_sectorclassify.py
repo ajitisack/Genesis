@@ -11,7 +11,7 @@ import pandas as pd
 from requests.adapters import HTTPAdapter
 from selectolax.parser import HTMLParser
 
-from ..utils import Utility
+from stockdata.utils import Utility
 
 class SectorClassify():
 

@@ -7,12 +7,12 @@ from requests.adapters import HTTPAdapter
 from selectolax.parser import HTMLParser
 from concurrent.futures import ThreadPoolExecutor
 
-from ..config import Config
-from ..sqlite import SqLite
-from ..utils import Utility
-from ..historicaldata.loadhistdata import HistData
+from stockdata.historicaldata.loadhistdata import HistData
+from stockdata.config import Config
+from stockdata.sqlite import SqLite
+from stockdata.utils import Utility
 
-class Indices(HistData):
+class Indices(HistData, Config):
 
     def __init__(self):
         Config.__init__(self)

@@ -1,22 +1,22 @@
-from .stockdata import getdata
-from .stockdata import loadtotable
+from main import getdata
+from main import loadtotable
 
-from .stockdata import downloadhistdata
-from .stockdata import downloadprofile
-from .stockdata import downloadintradaydata
+from main import downloadhistdata
+from main import downloadprofile
+from main import downloadintradaydata
 
-from .stockdata import downloadsymbols
-from .stockdata import downloadnsehistdata
-from .stockdata import downloadbsehistdata
-from .stockdata import downloadindices
-from .stockdata import downloadnseintradaydata
-from .stockdata import downloadbseintradaydata
+from main import downloadsymbols
+from main import downloadnsehistdata
+from main import downloadbsehistdata
+from main import downloadindices
+from main import downloadnseintradaydata
+from main import downloadbseintradaydata
 
-from .stockdata import downloadnsesymboldetailsyf
-from .stockdata import downloadbsesymboldetailsyf
-from .stockdata import downloadnsesymboldetailsmc
-from .stockdata import downloadbsesymboldetailsmc
-from .stockdata import downloadsectorclassify
-
-from .techindicators import addIndicators
-from .techindicators import addMA
+from main import downloadnsesymboldetailsyf
+from main import downloadbsesymboldetailsyf
+from main import downloadnsesymboldetailsmc
+from main import downloadbsesymboldetailsmc
+from main import downloadsectorclassify
+#
+# from techindicators import addIndicators
+# from techindicators import addMA

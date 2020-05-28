@@ -1,13 +1,16 @@
+import os
 import sqlite3
 import functools
+import pkgutil
 from configparser import ConfigParser
 from configparser import ExtendedInterpolation
 
 class SqLite():
 	conn = None
 	cp = ConfigParser(interpolation=ExtendedInterpolation())
-	cp.read("./stockdata/config.ini")
-	# cp.read("config.ini")
+	# cp.read(r'C:/ajit/stockanalysis/stockdata/config.ini')
+	config_file = f'{os.path.dirname(__file__)}/config.ini'
+	cp.read(config_file)
 	dbfile = cp.get('database', 'dbfile')
 
 	def connector(func):

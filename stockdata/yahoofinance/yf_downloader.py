@@ -2,10 +2,10 @@ import pandas as pd
 from itertools import repeat
 from concurrent.futures import ThreadPoolExecutor
 
-from .yf_symboldetails import SymbolDetails
-from ..config import Config
-from ..sqlite import SqLite
-from ..utils import Utility
+from stockdata.yahoofinance.yf_symboldetails import SymbolDetails
+from stockdata.config import Config
+from stockdata.sqlite import SqLite
+from stockdata.utils import Utility
 
 class YahooFinance(Config, SymbolDetails):
 

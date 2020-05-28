@@ -3,7 +3,7 @@ import requests
 import arrow
 from requests.adapters import HTTPAdapter
 
-from ..sdlogger import SDLogger
+from stockdata.sdlogger import SDLogger
 
 class HistDataDict(SDLogger):
 
