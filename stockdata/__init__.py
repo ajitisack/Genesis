@@ -1,4 +1,5 @@
 from main import getdata
+from main import gethistprice
 from main import loadtotable
 
 from main import downloadhistdata

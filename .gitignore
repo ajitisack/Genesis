@@ -8,10 +8,7 @@ __pycache__/*
 stockdata/*.db
 *.db
 stockdata/__pycache__/*
+notebooks/*.json
+intradaydata/*
 docs/*
-excel/*.xlsx
-excel/*.xls
-docs/*.txt
-docs/*.pdf
-docs/*.doc
-docs/*.docx
+excel/*

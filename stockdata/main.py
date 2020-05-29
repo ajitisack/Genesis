@@ -16,11 +16,19 @@ def getdata(query):
     df = Utility.reducesize(df)
     return df
 
+@SqLite.connector
+def gethistprice(exchange, symbol):
+    query = f"select * from {exchange.lower()}histprice where symbol = '{symbol.upper()}' order by date desc"
+    df = pd.read_sql(query, SqLite.conn)
+    df = Utility.reducesize(df)
+    df['date'] = pd.to_datetime(df['date'])
+    return df
+
 def loadtotable(df, tblname):
     df = Utility.reducesize(df)
     SqLite.loadtable(df, tblname)
 
-def downloadhistdata(startdt='2015-01-01'):
+def downloadhistdata(startdt='1970-01-01'):
     symbols = Symbols()
     symbols.download()
     del symbols
@@ -39,13 +47,13 @@ def downloadintradaydata(date):
     del id
 
 def downloadprofile():
-    mc = MoneyControl()
-    mc.downloaddetails(n_symbols=0, loadtotable=True)
-    del mc
     yf = YahooFinance()
     yf.downloaddetails('NSE', n_symbols=0, loadtotable=True)
     yf.downloaddetails('BSE', n_symbols=0, loadtotable=True)
     del yf
+    mc = MoneyControl()
+    mc.downloaddetails(n_symbols=0, loadtotable=True)
+    del mc
 
 def downloadnseintradaydata(date, n_symbols=0):
     return IntraDayData().download('NSE', date, n_symbols)
@@ -56,13 +64,13 @@ def downloadbseintradaydata(date, n_symbols=0):
 def downloadsymbols():
     return Symbols().download()
 
-def downloadindices(startdt='2020-01-01'):
+def downloadindices(startdt='1970-01-01'):
     return Indices().loadindicesdata(startdt)
 
-def downloadnsehistdata(n_symbols=0, loadtotable=True, startdt='2020-01-01'):
+def downloadnsehistdata(n_symbols=0, loadtotable=True, startdt='1970-01-01'):
     return HistData().download('NSE', n_symbols, loadtotable, startdt)
 
-def downloadbsehistdata(n_symbols=0, loadtotable=True, startdt='2020-01-01'):
+def downloadbsehistdata(n_symbols=0, loadtotable=True, startdt='1970-01-01'):
     return HistData().download('BSE', n_symbols, loadtotable, startdt)
 
 def downloadnsesymboldetailsyf(n_symbols=0, loadtotable=True):
