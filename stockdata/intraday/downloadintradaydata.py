@@ -46,5 +46,5 @@ class IntraDayData(IntraDayDataDict, Config):
         df = self.processdf(df)
         df = df.astype({'volume': int})
         file = f"{self.intraday_dir}\\{exchange}_{date.replace('-','')}.txt"
-        df.to_csv(file, index=False)
+        df.to_csv(file, index=False, header=False)
         print('Completed!')

@@ -19,5 +19,5 @@ from main import downloadnsesymboldetailsmc
 from main import downloadbsesymboldetailsmc
 from main import downloadsectorclassify
 #
-# from techindicators import addIndicators
-# from techindicators import addMA
+from techindicators import addIndicators
+from techindicators import addMA

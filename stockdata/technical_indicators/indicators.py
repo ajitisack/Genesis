@@ -1,8 +1,8 @@
 from configparser import ConfigParser
 from configparser import ExtendedInterpolation
 
-from .trend import TrendIndicators
-from ..config import Config
+from stockdata.technical_indicators.trend import TrendIndicators
+from stockdata.config import Config
 
 class Indicators(Config, TrendIndicators):
 

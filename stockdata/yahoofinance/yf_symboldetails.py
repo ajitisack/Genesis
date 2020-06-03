@@ -22,7 +22,10 @@ class SymbolDetails():
         with requests.Session() as session:
             session.mount(url, HTTPAdapter(max_retries=self.request_max_retries))
             response = session.get(url)
-        json_str = json.loads(response.text).get('quoteSummary').get('result')[0]
+        json_str = json.loads(response.text)
+        if json_str: json_str = json_str.get('quoteSummary')
+        if json_str: json_str = json_str.get('result')
+        if json_str: json_str = json_str[0]
         return json_str
 
     def getitemvalue(self, json_str, section, item):

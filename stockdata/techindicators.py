@@ -1,6 +1,6 @@
 import pandas as pd
 
-from .technical_indicators.indicators import Indicators
+from stockdata.technical_indicators.indicators import Indicators
 
 def addIndicators(df):
     return Indicators().createIndicators(df)
