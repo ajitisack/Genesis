@@ -1,4 +1,5 @@
 import pandas as pd
+import arrow
 from itertools import repeat
 from concurrent.futures import ThreadPoolExecutor
 
@@ -43,9 +44,11 @@ class YahooFinance(Config, SymbolDetails):
         df.drop(esgcols, axis=1, inplace=True)
         df     = Utility.reducesize(df)
         df_esg = Utility.reducesize(df_esg)
+        df['rundt'] = arrow.now().format('YYYY-MM-DD')
+        df_esg['rundt'] = arrow.now().format('YYYY-MM-DD')
         if not loadtotable: return df, df_esg
         SqLite.loadtable(df, tbl_details)
-        SqLite.createindex(tbl_details, 'symbol')
+        # SqLite.createindex(tbl_details, 'symbol')
         if not df_esg.empty :
             SqLite.loadtable(df_esg, tbl_esgscores)
-            SqLite.createindex(tbl_esgscores, 'symbol')
+            # SqLite.createindex(tbl_esgscores, 'symbol')

@@ -1,4 +1,5 @@
 import pandas as pd
+import arrow
 from itertools import repeat
 from concurrent.futures import ThreadPoolExecutor
 
@@ -52,6 +53,7 @@ class MoneyControl(SDLogger, Config, SymbolDetails):
             results = executor.map(self.getsymboldetails, params, repeat(exchange))
         df = pd.DataFrame(results)
         df = Utility.reducesize(df)
+        df['rundt'] = arrow.now().format('YYYY-MM-DD')
         print('Completed')
         if not loadtotable: return df
         SqLite.loadtable(df, tbl_mcprofile)

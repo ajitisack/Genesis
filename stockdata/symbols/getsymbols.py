@@ -1,9 +1,5 @@
-import requests as requests
 import pandas as pd
-import json
 import arrow
-import re
-import requests
 from collections import defaultdict
 
 from stockdata.utils import Utility
@@ -69,6 +65,7 @@ class Symbols(SDLogger, Config):
         df.fillna('', inplace=True)
         df['dateoflisting'] = df['dateoflisting'].apply(lambda x: '1900-01-01' if x == '' else x)
         df['dateoflisting'] = pd.to_datetime(df['dateoflisting'])
+        df['rundt'] = arrow.now().format('YYYY-MM-DD')
         df.sort_values('symbol', inplace=True, ignore_index=True)
         # with pd.ExcelWriter(self.excel_seclist) as writer:
         #     bse.to_excel(writer, sheet_name='BSE', index=False, freeze_panes=(1,0))
