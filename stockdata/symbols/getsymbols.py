@@ -22,8 +22,8 @@ class Symbols(SDLogger, Config):
         .replace('(','')\
         .replace(')','')\
         .replace('*', '')\
-        .replace('LTD.','Ltd')\
-        .replace('Limited', 'Ltd')\
+        .replace('LTD.','')\
+        .replace('Limited', '')\
         .title()
 
     def getnsesymbols(self):

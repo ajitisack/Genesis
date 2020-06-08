@@ -14,7 +14,8 @@ class IndexSymbols():
             response = session.get(url, headers=headers)
         data = StringIO(response.text)
         df = pd.read_csv(data)
-        df.insert(0, 'indexname', indexname)
+        df.insert(0, 'indextype', type)
+        df.insert(1, 'indexname', indexname)
         return df
 
     def getbseindexsymbols(self, params):

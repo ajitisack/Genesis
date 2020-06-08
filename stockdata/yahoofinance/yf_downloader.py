@@ -44,7 +44,9 @@ class YahooFinance(Config, SymbolDetails):
         df.drop(esgcols, axis=1, inplace=True)
         df     = Utility.reducesize(df)
         df_esg = Utility.reducesize(df_esg)
+        df = df.apply(lambda x: pd.to_numeric(x, errors='ignore'))
         df['rundt'] = arrow.now().format('YYYY-MM-DD')
+        df_esg = df_esg.apply(lambda x: pd.to_numeric(x, errors='ignore'))
         df_esg['rundt'] = arrow.now().format('YYYY-MM-DD')
         if not loadtotable: return df, df_esg
         SqLite.loadtable(df, tbl_details)
