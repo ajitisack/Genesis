@@ -17,27 +17,40 @@ def getdata(query):
 
 @SqLite.connector
 def getnsehistprice(symbol):
-    query = f"select * from nsehistprice where symbol = '{symbol.upper()}'"
+    if type(symbol) == list:
+        symbol = "','".join(symbol)
+    query = f"select * from nsehistprice where symbol in ('{symbol.upper()}')"
     df = pd.read_sql(query, SqLite.conn)
     df = Utility.reducesize(df)
     df['date'] = pd.to_datetime(df['date'])
     df.set_index('date', inplace=True)
     return df
 
+def getweeklynsehistprice(symbol):
+    df = getnsehistprice(symbol)
+    cols = df.columns
+    df = df.reset_index()
+    df = df.groupby(['symbol', 'year', 'wknr']).last().reset_index().set_index('date')
+    return df[cols]
+
+def getmonthlynsehistprice(symbol):
+    df = getnsehistprice(symbol)
+    cols = df.columns
+    df = df.reset_index()
+    df = df.groupby(['symbol', 'year', 'month']).last().reset_index().set_index('date')
+    return df[cols]
+
+def getyearlynsehistprice(symbol):
+    df = getnsehistprice(symbol)
+    cols = df.columns
+    df = df.reset_index()
+    df = df.groupby(['symbol', 'year']).last().reset_index().set_index('date')
+    return df[cols]
+
 def loadtotable(df, tblname):
     df = Utility.reducesize(df)
     SqLite.loadtable(df, tblname)
 
 def searchsymbol(name):
-    df = getdata(f"select * from symbols where name like '%{name.upper()}%'")
+    df = getdata(f"select * from symbols where name like '%{name.upper()}%' or symbol like '%{name.upper()}%'   ")
     return df
-    # fig = go.Figure(data=[go.Table(
-    # header=dict(values=['Symbol', 'Name', 'Industry', 'Group', 'NSE Date of Listing', 'Listed in NSE', 'Listed in BSE'],
-    #             fill_color='skyblue',
-    #             font=dict(size=14),
-    #             align='left'),
-    # cells=dict(values=[df.symbol, df.name, df.industry, df.group, df.dateoflisting, df.innse, df.inbse],
-    #            fill_color='lavender',
-    #            align='left'))
-    # ])
-    # fig.show()

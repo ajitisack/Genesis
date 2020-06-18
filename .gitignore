@@ -4,11 +4,8 @@
 *.xlsx
 *.db
 *.log
+*.json
+*.zip
 __pycache__/*
-stockdata/*.db
-*.db
-stockdata/__pycache__/*
-notebooks/*.json
-intradaydata/*
 docs/*
 excel/*

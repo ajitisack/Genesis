@@ -1,11 +1,15 @@
 from main import downloadsymbols
-from main import getdata
-from main import getnsehistprice
 from main import loadtotable
 from main import searchsymbol
+from main import getdata
+from main import getnsehistprice
+from main import getweeklynsehistprice
+from main import getmonthlynsehistprice
+from main import getyearlynsehistprice
 
 from nse import downloadnsehistdata
 from nse import downloadnseintradaydata
+from nse import downloadnsemarketpreopendata
 from nse import downloadnseindices
 from nse import downloadnseindiceshistdata
 from nse import downloadnsesymboldetailsyf
@@ -19,5 +23,8 @@ from bse import downloadbsesymboldetailsmc
 from techindicators import addIndicators
 from techindicators import addMA
 
+from analysis import addpricechange
+
+from charts import chart
 from charts import nsechart
 from charts import nseindexsymbolschart

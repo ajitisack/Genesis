@@ -4,6 +4,10 @@ pd.options.plotting.backend = "plotly"
 from stockdata.main import getdata
 from stockdata.main import getnsehistprice
 
+def chart(x):
+    plt = x.plot.area(template='plotly_white', y=x.name)
+    plt.show()
+
 def nsechart(symbol):
     symbol = symbol.upper().strip()
     name = getdata(f"select name from symbols where symbol = '{symbol}'").name[0]
