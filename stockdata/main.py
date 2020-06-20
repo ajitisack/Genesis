@@ -15,13 +15,12 @@ def getdata(query):
     df = Utility.reducesize(df)
     return df
 
-@SqLite.connector
 def getnsehistprice(symbol):
     if type(symbol) == list:
+        symbol = map(lambda x: x.upper().strip(), symbol)
         symbol = "','".join(symbol)
-    query = f"select * from nsehistprice where symbol in ('{symbol.upper()}')"
-    df = pd.read_sql(query, SqLite.conn)
-    df = Utility.reducesize(df)
+    symbol = symbol.upper().strip()
+    df = getdata(f"select * from nsehistprice where symbol in ('{symbol}')")
     df['date'] = pd.to_datetime(df['date'])
     df.set_index('date', inplace=True)
     return df

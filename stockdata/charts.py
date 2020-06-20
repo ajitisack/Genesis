@@ -8,13 +8,20 @@ def chart(x):
     plt = x.plot.area(template='plotly_white', y=x.name)
     plt.show()
 
-def nsechart(symbol):
-    symbol = symbol.upper().strip()
-    name = getdata(f"select name from symbols where symbol = '{symbol}'").name[0]
-    df = getnsehistprice(symbol)
-    plt = df.close.plot.area(template='plotly_white', title=f'{name} [{symbol}]', y='close')
-    plt.show()
+def nsechart(symbols):
+    if type(symbols) == list:
+        symbols = list(map(lambda x: x.upper().strip(), symbols))
+    else:
+        symbols = [symbols.upper().strip()]
+    df = getnsehistprice(symbols)
+    for symbol in symbols:
+        x = getdata(f"select name, industry from symbols where symbol = '{symbol}'")
+        name = x['name'][0]
+        industry = x['industry'][0]
+        dfx = df[df.symbol==symbol]
+        plt = dfx.close.plot.area(template='plotly_white', title=f'{name} [{symbol}] - {industry}', y='close')
+        plt.show()
 
 def nseindexsymbolschart(index_name):
-    symbols = getdata(f"select exchange, symbol from nseindices where indexname = '{index_name}'").symbol.to_list()
-    [nsechart(i) for i in symbols]
+    df = getdata(f"select exchange, symbol from nseindices where indexname = '{index_name}'")
+    nsechart(df.symbol.to_list())
