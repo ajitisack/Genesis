@@ -26,6 +26,13 @@ class Symbols(SDLogger, Config):
         .replace('Limited', '')\
         .title()
 
+    def getnsefandosymbols(self):
+        df = pd.read_csv(self.nsefosymbols)
+        df.columns = ['symbol']
+        df = df[~df.symbol.isin(['Code', 'NIFTY', 'BANKNIFTY'])]
+        df['innsefo'] = 1
+        return df
+
     def getnsesymbols(self):
         cols = ['symbol', 'name', 'series', 'dateoflisting', 'paidupvalue', 'marketlot', 'isin', 'facevalue']
         df = pd.read_csv(self.nselist, names = cols, header=0)
@@ -60,13 +67,20 @@ class Symbols(SDLogger, Config):
         df['innse'] = df['nsesymbol'].apply(lambda x: 1 if x in list(nse.symbol) else 0)
         df['inbse'] = df['bsesymbol'].apply(lambda x: 1 if x in list(bse.symbol) else 0)
         df['inall'] = df.apply(lambda x: 1 if x['innse']==1 and x['inbse']==1 else 0, axis=1)
-        new_cols = ['isin', 'symbol', 'innse', 'inbse', 'inall', 'nsesymbol', 'bsesymbol', 'name', 'industry', 'facevalue', 'group', 'series', 'dateoflisting', 'paidupvalue', 'marketlot']
-        df = Utility.reducesize(df[new_cols])
+        df = Utility.reducesize(df)
         df.fillna('', inplace=True)
         df['dateoflisting'] = df['dateoflisting'].apply(lambda x: '1900-01-01' if x == '' else x)
         df['dateoflisting'] = pd.to_datetime(df['dateoflisting'])
-        df['rundt'] = arrow.now().format('YYYY-MM-DD')
+        # include idenitifer for futures and options listed symbols
+        df_fo = self.getnsefandosymbols()
+        df = pd.merge(df, df_fo, how='outer', on='symbol')
+        df['innsefo'].fillna(0, inplace=True)
+        # re-order columns
         df.sort_values('symbol', inplace=True, ignore_index=True)
+        new_cols = ['isin', 'symbol', 'innse', 'inbse', 'inall', 'innsefo', 'nsesymbol', 'bsesymbol', 'name', 'industry', 'facevalue', 'group', 'series', 'dateoflisting', 'paidupvalue', 'marketlot']
+        df = df[new_cols]
+        # include rundate
+        df['rundt'] = arrow.now().format('YYYY-MM-DD')
         # with pd.ExcelWriter(self.excel_seclist) as writer:
         #     bse.to_excel(writer, sheet_name='BSE', index=False, freeze_panes=(1,0))
         #     nse.to_excel(writer, sheet_name='NSE', index=False, freeze_panes=(1,0))
