@@ -6,6 +6,10 @@
 *.log
 *.json
 *.zip
-__pycache__/*
+*.pyc
+__pycache__
 docs/*
 excel/*
+ppt/*
+intradaydata/*
+nse)market_preopen_data/*

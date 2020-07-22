@@ -25,6 +25,7 @@ from techindicators import addMA
 
 from analysis import addpricechange
 from analysis import addvolumechange
+from analysis import basicanalysis
 
 from charts import chart
 from charts import nsechart
