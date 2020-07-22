@@ -23,7 +23,7 @@ class IndicesSymbols(IndicesList, IndexSymbols, Config):
             func_indexsymbols = self.getbseindexsymbols
             tbl_indices       = self.tbl_bseindices
         indices = self.readIndices(exchange)
-        print(f'Downloading symbols of {indices.shape[0]} {exchange.upper()} indices from niftyindices.com', end='...', flush=True)
+        print(f'Downloading symbols of {indices.shape[0]} {exchange.upper()} indices from nseindia.com', end='...', flush=True)
         params = zip(indices.exchange, indices.type, indices.name, indices.url)
         nthreads = min(indices.shape[0], int(self.maxthreads))
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
