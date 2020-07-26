@@ -27,23 +27,29 @@ class MarketPreOpen(Config):
             x = {}
             x['symbol'] = data[i]['metadata']['symbol']
             x['time']   = data[i]['detail']['preOpenMarket']['lastUpdateTime']
-            x['price']  = data[i]['detail']['preOpenMarket']['finalPrice']
+            x['prevclose']   = data[i]['metadata']['previousClose']
+            x['open']  = data[i]['detail']['preOpenMarket']['finalPrice']
+            x['pricechange'] = data[i]['metadata']['change']
+            x['pricechangepct'] = data[i]['metadata']['pChange']
+            x['yearlow'] = data[i]['metadata']['yearLow']
+            x['yearhigh'] = data[i]['metadata']['yearHigh']
             x['volume'] = data[i]['detail']['preOpenMarket']['totalTradedVolume']
             x['sellqty']= data[i]['detail']['preOpenMarket']['totalSellQuantity']
             x['buyqty'] = data[i]['detail']['preOpenMarket']['totalBuyQuantity']
             plist.append(x)
         df = pd.DataFrame(plist)
         df['time'] = pd.to_datetime(df['time'])
+        df['openingtype'] = df['pricechange'].apply(lambda x: 'No-Gap' if x == 0 else ('Gap-Up' if x > 0 else 'Gap-Down'))
         return df
 
     @Utility.timer
-    def savensepreopendata(self):
+    def download(self):
+        tblname = self.tbl_nsepreopen
         print(f'Downloading NSE Pre-open prices', end='...', flush=True)
         data = self.getjsonstr()
         df = self.getnsepreopendf(data)
+        df = Utility.reducesize(df)
+        df['rundt'] = arrow.now().format('YYYY-MM-DD')
         date = arrow.get(df.iloc[0,1]).format('YYYYMMDD')
-        filename = f'{self.nsemktpreopenpath}/nse_preopen_{date}'
-        df.to_csv(filename, index=False)
-        with ZipFile(f'{filename}.zip','w') as zipfile: zipfile.write(filename, compress_type=ZIP_DEFLATED)
-        os.remove(filename)
-        print(f'- {date} Completed')
+        print(f'Completed [{date}]')
+        SqLite.loadtable(df, tblname)

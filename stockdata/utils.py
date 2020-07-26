@@ -43,7 +43,7 @@ class Utility():
 
     @staticmethod
     def addtimefeatures(df):
-        df['timestamp']  = pd.to_datetime(df['timestamp'], format='%Y-%m-%d %H:%M')
+        df['timestamp']  = df['timestamp'].apply(lambda x: datetime.datetime.fromtimestamp(x))
         df['date']    = df['timestamp'].dt.date
         df['year']    = df['timestamp'].dt.year
         df['month']   = df['timestamp'].dt.month
@@ -54,6 +54,8 @@ class Utility():
         df['time']    = df['timestamp'].dt.time
         df['after12'] = df['time'].apply(lambda x: 1 if x >= datetime.time(12,0) else 0)
         df['dayhour'] = df['time'].apply(lambda x: Utility.hoursbinning(x))
+        df['timestamp'] = df['timestamp'].apply(lambda x: x.strftime("%a %b-%d-%Y %H:%M"))
+        df['time'] = df['time'].apply(lambda x: x.strftime("%H:%M"))
         return df
 
     @staticmethod

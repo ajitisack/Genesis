@@ -52,7 +52,8 @@ class MoneyControl(SDLogger, Config, SymbolDetails):
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
             results = executor.map(self.getsymboldetails, params, repeat(exchange))
         df = pd.DataFrame(results)
-        df = Utility.reducesize(df)
+        df.dropna(inplace=True)
+        df = df.apply(lambda x: pd.to_numeric(x, errors='ignore'))
         df['rundt'] = arrow.now().format('YYYY-MM-DD')
         print('Completed')
         if not loadtotable: return df

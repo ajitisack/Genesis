@@ -25,6 +25,7 @@ def getnsehistprice(symbol):
     df.set_index('date', inplace=True)
     return df
 
+# needs to be corrected
 def getweeklynsehistprice(symbol):
     df = getnsehistprice(symbol)
     cols = df.columns
@@ -32,6 +33,7 @@ def getweeklynsehistprice(symbol):
     df = df.groupby(['symbol', 'year', 'wknr']).last().reset_index().set_index('date')
     return df[cols]
 
+# needs to be corrected
 def getmonthlynsehistprice(symbol):
     df = getnsehistprice(symbol)
     cols = df.columns
@@ -39,6 +41,7 @@ def getmonthlynsehistprice(symbol):
     df = df.groupby(['symbol', 'year', 'month']).last().reset_index().set_index('date')
     return df[cols]
 
+# needs to be corrected
 def getyearlynsehistprice(symbol):
     df = getnsehistprice(symbol)
     cols = df.columns

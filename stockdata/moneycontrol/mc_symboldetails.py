@@ -9,7 +9,7 @@ class SymbolDetails():
 
     def getsymboldetails(self, params, exchange):
         isin, symbolid, symbolcd = params
-        values = {'isin':isin, 'symbolid':symbolid, 'symbolcd':symbolcd, 'exchange':exchange}
+        values = {'isin':isin, 'symbolid':symbolid, 'symbolcd':symbolcd}
         try:
             for section in self.terms.keys():
                 api = f'{self.mcpriceapiurl}/{exchange.lower()}/{section}/{symbolid}'

@@ -1,6 +1,6 @@
 from stockdata.historicaldata.loadhistdata import HistData
 from stockdata.intraday.downloadintradaydata import IntraDayData
-from stockdata.preopenmarketdata.nse_getmarketpreopendata import MarketPreOpen
+from stockdata.preopendata.download_nsepreopendata import MarketPreOpen
 from stockdata.indices.download_indices_symbols import IndicesSymbols
 from stockdata.indices.download_indices_histdata import IndicesHistData
 from stockdata.yahoofinance.yf_downloader import YahooFinance
@@ -13,8 +13,14 @@ def downloadnsehistdata(n_symbols=0, loadtotable=True, startdt='1970-01-01'):
 def downloadnseintradaydata(date, n_symbols=0):
     return IntraDayData().download('NSE', date, n_symbols)
 
-def downloadnsemarketpreopendata():
-    return MarketPreOpen().savensepreopendata()
+def createnseintradaymonthlyfile(yyyymm):
+    return IntraDayData().processmonthlyfiles('NSE', yyyymm)
+
+def loadnseintradayfile(yyyymm):
+    return IntraDayData().loadintradayfile('NSE', yyyymm)
+
+def downloadnsepreopendata():
+    return MarketPreOpen().download()
 
 def downloadnseindices(loadtotable=True):
     return IndicesSymbols().downloadindicessymbols('NSE', loadtotable)
