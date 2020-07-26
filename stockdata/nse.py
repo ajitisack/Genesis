@@ -1,5 +1,8 @@
+import arrow
+
 from stockdata.historicaldata.loadhistdata import HistData
 from stockdata.intraday.downloadintradaydata import IntraDayData
+from stockdata.intraday.streamintradaydata import StreamIntraDayData
 from stockdata.preopendata.download_nsepreopendata import MarketPreOpen
 from stockdata.indices.download_indices_symbols import IndicesSymbols
 from stockdata.indices.download_indices_histdata import IndicesHistData
@@ -9,6 +12,9 @@ from stockdata.moneycontrol.mc_downloader import MoneyControl
 # to download historical prices and events of NSE symbols
 def downloadnsehistdata(n_symbols=0, loadtotable=True, startdt='1970-01-01'):
     return HistData().download('NSE', n_symbols, loadtotable, startdt)
+
+def streamnseintraday(date=arrow.now().format('YYYY-MM-DD'), n_symbols=0):
+    return StreamIntraDayData().stream('NSE', date, n_symbols)
 
 def downloadnseintradaydata(date, n_symbols=0):
     return IntraDayData().download('NSE', date, n_symbols)

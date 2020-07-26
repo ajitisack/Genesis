@@ -17,6 +17,7 @@ from nse import downloadnsesymboldetailsmc
 from nse import downloadnseintradaydata
 from nse import createnseintradaymonthlyfile
 from nse import loadnseintradayfile
+from nse import streamnseintraday
 
 from bse import downloadbseintradaydata
 from bse import downloadbsehistdata
