@@ -1,58 +1,17 @@
-/*** Indices View ***/
-drop view if exists indices;
-create view indices as 
-	select c.symbol, b.isin, a.*
-	from nseindices a
-		left outer join nseprofilemc b on a.code = b.symbolcd
-		left outer join symbols c on b.isin = c.isin
-	where 1 = 1
-	union all
-	select c.symbol, b.isin, a.*
-	from bseindices a
-		left outer join bseprofilemc b on a.code = b.symbolcd
-		left outer join symbols c on b.isin = c.isin
-	where 1 = 1;
+drop view if exists nsecurrent;
+create view nsecurrent as
+    select timestamp, 'equity' type, b.name || '(' || a.symbol || ')' as name, open, low, high, close, volume, change, changepct, runts
+    from nsecurrentpriceequity a
+        join symbols b on a.symbol = b.symbol
+    union all
+    select timestamp, indextype type, a.indexname as name, open, low, high, close, volume, change, changepct, runts
+    from nsecurrentpriceindices a
+        join (select distinct lower(indextype) || '_index' as indextype, indexname from nseindices) b on a.indexname = b.indexname
+;
 
-	
-
-/*** Actions View ***/
-drop view if exists events;
-create view events as 
-	select * from nseevents where 1 = 1
-	union all
-	select * from bseevents where 1 = 1;
-
-
-
-/*** EsgScores View ***/
-drop view if exists esgscores;
-create view esgscores as 
-	select * from nseesgscores where 1 = 1
-	union all
-	select * from bseesgscores where 1 = 1;
-
-
-
-/*** HistPrice View ***/
-drop view if exists histprice;
-create view histprice as 
-	select * from nsehistprice where 1 = 1
-	union all
-	select * from bsehistprice where 1 = 1;
-
-	
-	
-/*** Yahoo Finance Profile View ***/
-drop view if exists profileyf;
-create view profileyf as 
-	select * from nseprofileyf where 1 = 1
-	union all
-	select * from bseprofileyf where 1 = 1;
-
-
-/*** Money Control Profile View ***/
-drop view if exists profilemc;
-create view profilemc as 
-	select * from nseprofilemc where 1 = 1
-	union all
-	select * from bseprofilemc where 1 = 1;
+drop view if exists nseintradayhist;
+create view nseintradayhist as
+    select * from nseintraday_202005 union all
+    select * from nseintraday_202006 union all
+    select * from nseintraday_202007
+;
