@@ -80,7 +80,7 @@ class Symbols(SDLogger, Config):
         new_cols = ['isin', 'symbol', 'innse', 'inbse', 'inall', 'innsefo', 'nsesymbol', 'bsesymbol', 'name', 'industry', 'facevalue', 'group', 'series', 'dateoflisting', 'paidupvalue', 'marketlot']
         df = df[new_cols]
         # include rundate
-        df['rundt'] = arrow.now().format('YYYY-MM-DD')
+        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
         # with pd.ExcelWriter(self.excel_seclist) as writer:
         #     bse.to_excel(writer, sheet_name='BSE', index=False, freeze_panes=(1,0))
         #     nse.to_excel(writer, sheet_name='NSE', index=False, freeze_panes=(1,0))

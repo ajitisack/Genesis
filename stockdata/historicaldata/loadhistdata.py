@@ -28,6 +28,7 @@ class HistData(HistDataDict, Config):
         df['exchange'] = df['exchange'].apply(lambda x: x.replace('NSI', 'NSE'))
         df = Utility.adddatefeatures(df)
         df = Utility.reducesize(df)
+        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
         return df
 
     @Utility.timer

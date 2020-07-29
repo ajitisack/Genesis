@@ -7,10 +7,12 @@ from main import getweeklynsehistprice
 from main import getmonthlynsehistprice
 from main import getyearlynsehistprice
 
-from nse import downloadnsehistdata
 from nse import downloadnsepreopendata
+from nse import downloadnsecurrentprice
+from nse import downloadnseindicescurrentprice
+from nse import downloadnsehistdata
 from nse import downloadnseindices
-from nse import downloadnseindiceshistdata
+
 from nse import downloadnsesymboldetailsyf
 from nse import downloadnsesymboldetailsmc
 

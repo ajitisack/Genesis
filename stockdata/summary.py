@@ -92,6 +92,6 @@ def loadbasicsummary(loadtotable=True):
     df = pd.merge(df1, df2, how='outer', on='symbol')
     df = Utility.reducesize(df)
     if not loadtotable: return df
-    df['rundt'] = arrow.now().format('YYYY-MM-DD')
+    df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
     SqLite.loadtable(df, tblname)
     # SqLite.createindex(tblname, 'symbol')

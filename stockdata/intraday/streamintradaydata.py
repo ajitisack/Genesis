@@ -27,11 +27,13 @@ class StreamIntraDayData(IntraDayDataDict, Config):
         df = Utility.addtimefeatures(df)
         df = Utility.reducesize(df)
         df = df.astype({'volume': int})
+        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
         return df
 
     @Utility.timer
     def stream(self, exchange, date, n_symbols):
-        tblname = f'{exchange.lower()}intraday'
+        if exchange == 'NSE': tblname = self.tbl_nseintraday
+        if exchange == 'BSE': tblname = self.tbl_bseintraday
         symbols = self.getsymbols(exchange, n_symbols)
         print(f'Downloading intraday prices from yahoo finance for {date} {exchange.upper()} {len(symbols)} symbols', end='...', flush=True)
         nthreads = min(len(symbols), int(self.maxthreads))

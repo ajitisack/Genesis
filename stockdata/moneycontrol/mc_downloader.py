@@ -54,7 +54,7 @@ class MoneyControl(SDLogger, Config, SymbolDetails):
         df = pd.DataFrame(results)
         df.dropna(inplace=True)
         df = df.apply(lambda x: pd.to_numeric(x, errors='ignore'))
-        df['rundt'] = arrow.now().format('YYYY-MM-DD')
+        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
         print('Completed')
         if not loadtotable: return df
         SqLite.loadtable(df, tbl_mcprofile)

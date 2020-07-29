@@ -49,7 +49,7 @@ class MarketPreOpen(Config):
         data = self.getjsonstr()
         df = self.getnsepreopendf(data)
         df = Utility.reducesize(df)
-        df['rundt'] = arrow.now().format('YYYY-MM-DD')
+        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
         date = arrow.get(df.iloc[0,1]).format('YYYYMMDD')
         print(f'Completed [{date}]')
         SqLite.loadtable(df, tblname)
