@@ -14,7 +14,7 @@ from stockdata.moneycontrol.mc_downloader import MoneyControl
 def downloadnsehistdata(n_symbols=0, loadtotable=True, startdt='1970-01-01'):
     return HistData().download('NSE', n_symbols, loadtotable, startdt)
 
-def streamnseintraday(date=arrow.now().format('YYYY-MM-DD'), n_symbols=0):
+def downloadnseintradaytoday(date=arrow.now().format('YYYY-MM-DD'), n_symbols=0):
     return StreamIntraDayData().stream('NSE', date, n_symbols)
 
 def downloadnsecurrentprice(n_symbols=0, loadtotable=True):

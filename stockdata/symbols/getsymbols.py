@@ -94,4 +94,4 @@ class Symbols(SDLogger, Config):
         df = self.getallsymbols()
         print('Completed')
         SqLite.loadtable(df, tblname)
-        SqLite.createindex(tblname, 'symbol')
+        # SqLite.createindex(tblname, 'symbol')

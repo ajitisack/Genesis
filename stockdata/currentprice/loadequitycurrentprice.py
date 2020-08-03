@@ -16,7 +16,8 @@ class CurrentPriceEquity(CurrentPriceDict, Config):
 
     @SqLite.connector
     def getsymbols(self, exchange, n_symbols):
-        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from symbols where innsefo = 1 "
+        tblname = self.tbl_symbols
+        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from {tblname} where innsefo = 1 "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)

@@ -33,9 +33,9 @@ def volumechange(df, n=1):
     return df
 
 def nsenr479():
-    x = getdata("select distinct date from nsehistprice order by 1 desc limit 9").date.to_list()
+    x = getdata("select distinct date from nseeqhistprice order by 1 desc limit 9").date.to_list()
     dts = "'"+ "','".join(x) + "'"
-    df = getdata(f"select date, symbol, open, low, high, close from nsehistprice where date in ({dts})")
+    df = getdata(f"select date, symbol, open, low, high, close from nseeqhistprice where date in ({dts})")
     df['prevhigh'] = df.groupby('symbol').high.transform(lambda x: x.shift(1))
     df['prevlow']  = df.groupby('symbol').low.transform(lambda x: x.shift(1))
     df['tr']   = df['high'] - df['low']
@@ -69,8 +69,8 @@ def pivotpoints(df):
     return df
 
 def basissum():
-    currdt, prevdt = getdata("select distinct date from nsehistprice order by 1 desc limit 2").date.to_list()
-    df = getdata(f"select date, symbol, open, low, high, close, volume from nsehistprice where date in ('{currdt}', '{prevdt}')")
+    currdt, prevdt = getdata("select distinct date from nseeqhistprice order by 1 desc limit 2").date.to_list()
+    df = getdata(f"select date, symbol, open, low, high, close, volume from nseeqhistprice where date in ('{currdt}', '{prevdt}')")
     df = pricechange(df)
     df = volumechange(df)
     df = pivotpoints(df)
@@ -86,7 +86,7 @@ def basissum():
 
 @Utility.timer
 def loadbasicsummary(loadtotable=True):
-    tblname = 'nsesummary'
+    tblname = 'NSE_EquitySummary'
     df1 = basissum()
     df2 = nsenr479()
     df = pd.merge(df1, df2, how='outer', on='symbol')

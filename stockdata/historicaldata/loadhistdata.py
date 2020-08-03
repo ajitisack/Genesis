@@ -16,8 +16,8 @@ class HistData(HistDataDict, Config):
 
     @SqLite.connector
     def getsymbols(self, exchange, n_symbols):
-        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from symbols where innse = 1 "
-        if exchange == 'BSE': query = f"select symbol || '.BO' as symbol from symbols where inbse = 1 "
+        tblname = self.tbl_symbols
+        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from {tblname} where innse = 1 "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)
@@ -25,7 +25,7 @@ class HistData(HistDataDict, Config):
     def processdf(self, df):
         df['date'] = df['date'].apply(lambda x: arrow.get(x).format('YYYY-MM-DD'))
         df['symbol'] = df['symbol'].apply(lambda x: x.split('.')[0].replace('^', ''))
-        df['exchange'] = df['exchange'].apply(lambda x: x.replace('NSI', 'NSE'))
+        # df['exchange'] = df['exchange'].apply(lambda x: x.replace('NSI', 'NSE'))
         df = Utility.adddatefeatures(df)
         df = Utility.reducesize(df)
         df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
@@ -46,13 +46,13 @@ class HistData(HistDataDict, Config):
         histprice = pd.concat([pd.DataFrame(i[0]) for i in values], ignore_index=True)
         dividends = pd.concat([pd.DataFrame(i[1]) for i in values], ignore_index=True)
         splits    = pd.concat([pd.DataFrame(i[2]) for i in values], ignore_index=True)
-        actions   = pd.concat([dividends, splits], ignore_index=True)
+        events    = pd.concat([dividends, splits], ignore_index=True)
         histprice = self.processdf(histprice).dropna()
-        actions   = self.processdf(actions).dropna()
+        events    = self.processdf(events).dropna()
         histprice = histprice.astype({'volume': int})
         print('Completed!')
         if not loadtotable: return histprice, actions
         SqLite.loadtable(histprice, tbl_hprice)
         SqLite.createindex(tbl_hprice, 'symbol')
-        SqLite.loadtable(actions, tbl_actions)
-        SqLite.createindex(tbl_actions, 'symbol')
+        SqLite.loadtable(events, tbl_actions)
+        # SqLite.createindex(tbl_actions, 'symbol')

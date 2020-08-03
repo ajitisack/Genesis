@@ -16,7 +16,9 @@ class CurrentPriceIndices(CurrentPriceDict, Config):
 
     @SqLite.connector
     def getindices(self, exchange, n_symbols):
-        if exchange == 'NSE': query = f"select distinct indexsymbol, indexname from nseindices where indexsymbol <> ''"
+        if exchange == 'NSE':
+            tbl_indices = self.tbl_nseindices
+            query = f"select distinct indexsymbol, indexname from {tbl_indices} where indexsymbol <> ''"
         if n_symbols > 0: query += f' limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return df
@@ -47,6 +49,7 @@ class CurrentPriceIndices(CurrentPriceDict, Config):
             print('No data!')
             return None
         df = self.processdf(df)
+        df = df[df.volume==0].drop_duplicates()
         d = dict(zip(indices.indexsymbol, indices.indexname))
         df['symbol'] = df['symbol'].apply(lambda x: d[x])
         df.rename(columns={'symbol':'indexname'}, inplace=True)

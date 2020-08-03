@@ -17,7 +17,8 @@ class StreamIntraDayData(IntraDayDataDict, Config):
 
     @SqLite.connector
     def getsymbols(self, exchange, n_symbols):
-        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from symbols where innsefo = 1 "
+        tblname = self.tbl_symbols
+        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from {tblname} where innsefo = 1 "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)
@@ -33,7 +34,6 @@ class StreamIntraDayData(IntraDayDataDict, Config):
     @Utility.timer
     def stream(self, exchange, date, n_symbols):
         if exchange == 'NSE': tblname = self.tbl_nseintraday
-        if exchange == 'BSE': tblname = self.tbl_bseintraday
         symbols = self.getsymbols(exchange, n_symbols)
         print(f'Downloading intraday prices from yahoo finance for {date} {exchange.upper()} {len(symbols)} symbols', end='...', flush=True)
         nthreads = min(len(symbols), int(self.maxthreads))

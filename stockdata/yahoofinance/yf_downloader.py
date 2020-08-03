@@ -16,8 +16,8 @@ class YahooFinance(Config, SymbolDetails):
 
     @SqLite.connector
     def getsymbols(self, exchange, n_symbols):
-        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from symbols where innse = 1 "
-        if exchange == 'BSE': query = f"select symbol || '.BO' as symbol from symbols where inbse = 1 "
+        tblname = self.tbl_symbols
+        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from {tblname} where innse = 1 "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)

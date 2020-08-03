@@ -17,8 +17,8 @@ class IntraDayData(IntraDayDataDict, Config):
 
     @SqLite.connector
     def getsymbols(self, exchange, n_symbols):
-        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from symbols where innse = 1 "
-        if exchange == 'BSE': query = f"select symbol || '.BO' as symbol from symbols where inbse = 1 "
+        tblname = self.tbl_symbols
+        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from {tblname} where innse = 1 "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)
@@ -69,7 +69,7 @@ class IntraDayData(IntraDayDataDict, Config):
         print(f'Reading {exchange.upper()} intraday daily files for month {yyyymm}', end='...', flush=True)
         yyyymm = yyyymm.replace('-', '')
         infiles = glob(rf'{self.intraday_dir}/{exchange}_{yyyymm}*.zip')
-        tblname = f'{exchange.lower()}intraday_{yyyymm}'
+        if exchange == 'NSE': tblname = f'{self.tbl_nseintraday}_{yyyymm}'
         if not infiles:
             print('Error!')
             print(f'No file(s) matching with {self.intraday_dir}/{exchange}_{yyyymm}*.zip')

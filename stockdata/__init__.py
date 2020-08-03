@@ -19,7 +19,7 @@ from nse import downloadnsesymboldetailsmc
 from nse import downloadnseintradaydata
 from nse import createnseintradaymonthlyfile
 from nse import loadnseintradayfile
-from nse import streamnseintraday
+from nse import downloadnseintradaytoday
 
 from bse import downloadbseintradaydata
 from bse import downloadbsehistdata
@@ -30,6 +30,7 @@ from techindicators import addIndicators
 from techindicators import addMA
 
 from summary import loadbasicsummary
+from streamnseprices import streamnseprices
 
 from charts import chart
 from charts import nsechart
