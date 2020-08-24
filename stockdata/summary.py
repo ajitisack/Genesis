@@ -7,6 +7,7 @@ from stockdata.config import Config
 from stockdata.sqlite import SqLite
 from stockdata.utils import Utility
 
+nse_eq_hist_view = 'nseeq_histprice'
 
 def pricechange(df, n=1):
     prevclose = 'prevclose' if n==1  else f'prevclose_{n}d'
@@ -33,9 +34,9 @@ def volumechange(df, n=1):
     return df
 
 def nsenr479():
-    x = getdata("select distinct date from nseeqhistprice order by 1 desc limit 9").date.to_list()
+    x = getdata(f"select distinct date from {nse_eq_hist_view} order by 1 desc limit 9").date.to_list()
     dts = "'"+ "','".join(x) + "'"
-    df = getdata(f"select date, symbol, open, low, high, close from nseeqhistprice where date in ({dts})")
+    df = getdata(f"select date, symbol, open, low, high, close from {nse_eq_hist_view} where date in ({dts})")
     df['prevhigh'] = df.groupby('symbol').high.transform(lambda x: x.shift(1))
     df['prevlow']  = df.groupby('symbol').low.transform(lambda x: x.shift(1))
     df['tr']   = df['high'] - df['low']
@@ -60,6 +61,9 @@ def nsenr479():
 
 def pivotpoints(df):
     df['pp'] = (df['high'] + df['low'] + df['close'])/3
+    df['bc'] = (df['high'] + df['low'])/2
+    df['tc'] = 2 * df['pp'] - df['bc']
+    df['cpr'] = round(abs(df['tc'] - df['bc']),2)
     df['r1'] = 2 * df['pp'] - df['low']
     df['r2'] = df['pp'] + df['high'] - df['low']
     df['r3'] = df['high'] + 2 * (df['pp'] - df['low'])
@@ -69,8 +73,8 @@ def pivotpoints(df):
     return df
 
 def basissum():
-    currdt, prevdt = getdata("select distinct date from nseeqhistprice order by 1 desc limit 2").date.to_list()
-    df = getdata(f"select date, symbol, open, low, high, close, volume from nseeqhistprice where date in ('{currdt}', '{prevdt}')")
+    currdt, prevdt = getdata(f"select distinct date from {nse_eq_hist_view} order by 1 desc limit 2").date.to_list()
+    df = getdata(f"select date, symbol, open, low, high, close, volume from {nse_eq_hist_view} where date in ('{currdt}', '{prevdt}')")
     df = pricechange(df)
     df = volumechange(df)
     df = pivotpoints(df)

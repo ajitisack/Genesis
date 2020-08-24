@@ -8,8 +8,9 @@ from main import getmonthlynsehistprice
 from main import getyearlynsehistprice
 
 from nse import downloadnsepreopendata
-from nse import downloadnsecurrentprice
-from nse import downloadnseindicescurrentprice
+from nse import downloadnsefnostockscurrentprice
+from nse import downloadnseallindicescurrentprice
+
 from nse import downloadnsehistdata
 from nse import downloadnseindices
 
@@ -20,11 +21,6 @@ from nse import downloadnseintradaydata
 from nse import createnseintradaymonthlyfile
 from nse import loadnseintradayfile
 from nse import downloadnseintradaytoday
-
-from bse import downloadbseintradaydata
-from bse import downloadbsehistdata
-from bse import downloadbsesymboldetailsyf
-from bse import downloadbsesymboldetailsmc
 
 from techindicators import addIndicators
 from techindicators import addMA

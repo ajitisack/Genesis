@@ -10,7 +10,7 @@ from stockdata.config import Config
 from stockdata.sqlite import SqLite
 from stockdata.utils import Utility
 
-class MarketPreOpen(Config):
+class NSEMarketPreOpen(Config):
 
     def __init__(self):
         Config.__init__(self)

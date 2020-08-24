@@ -5,8 +5,8 @@ import stockdata as sd
 
 def job():
     print(f"START TIME : {arrow.now().format('ddd MMM-DD-YYYY HH:mm:ss')}")
-    sd.downloadnsecurrentprice()
-    sd.downloadnseindicescurrentprice()
+    sd.downloadnsefnostockscurrentprice()
+    sd.downloadnseallindicescurrentprice()
     sd.downloadnseintradaytoday()
     print(f"END TIME   : {arrow.now().format('ddd MMM-DD-YYYY HH:mm:ss')}")
     print("*********<DONE>*********\n")
