@@ -25,6 +25,7 @@ class CurrentPrice():
             x = {}
             d = data[i]
             x['symbol']         = d['symbol']
+            x['industry']       = d.get('meta').get('industry') or ''
             x['open']           = d['open']
             x['low']            = d['dayLow']
             x['high']           = d['dayHigh']
@@ -38,6 +39,7 @@ class CurrentPrice():
             x['yearlow']        = d['yearLow']
             plist.append(x)
         df = pd.DataFrame(plist)
+        df['industry'] = df['industry'].apply(lambda x: x.title())
         df['time'] = pd.to_datetime(json_str['metadata']['timeVal'])
         df['open'] = df['open'].astype(float)
         df['prevclose'] = df['prevclose'].astype(float)

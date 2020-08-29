@@ -23,14 +23,7 @@ class Symbols(SDLogger, Config):
         .replace(')','')\
         .replace('*', '')\
         .replace('LTD.','')\
-        .replace('Limited', '')\
-        .title()
-
-    def getnsefandosymbols(self):
-        df = pd.read_csv(self.nsefosymbols)
-        df.columns = ['symbol']
-        df['innsefo'] = 1
-        return df
+        .replace('Limited', '')
 
     def getnsesymbols(self):
         cols = ['symbol', 'name', 'series', 'dateoflisting', 'paidupvalue', 'marketlot', 'isin', 'facevalue']
@@ -41,18 +34,6 @@ class Symbols(SDLogger, Config):
         new_cols = ['isin', 'symbol', 'name', 'series', 'dateoflisting', 'paidupvalue', 'marketlot', 'facevalue']
         return df[new_cols]
 
-    def getbsesymbols(self):
-        df = pd.read_csv(self.bselist)
-        df.drop(['Security Code', 'Issuer Name', 'Status', 'Instrument'], axis = 1, inplace = True)
-        df['Industry'] = df['Industry'].apply(str.strip)
-        df = df[df['Industry'] != '']
-        df.columns = ['symbol', 'name', 'group', 'facevalue', 'isin', 'industry']
-        df['symbol'] = df['symbol'].apply(lambda x: x.replace('*', ''))
-        df['name'] = df['name'].apply(self.cleanstr)
-        df.fillna('', inplace=True)
-        new_cols = ['isin', 'symbol', 'name', 'group', 'facevalue', 'industry']
-        return df[new_cols]
-
     def getallsymbols(self):
         df = self.getnsesymbols()
         df = Utility.reducesize(df)
@@ -61,7 +42,7 @@ class Symbols(SDLogger, Config):
         df['dateoflisting'] = pd.to_datetime(df['dateoflisting'])
         # re-order columns
         df.sort_values('symbol', inplace=True, ignore_index=True)
-        new_cols = ['isin', 'symbol', 'name', 'facevalue', 'series', 'dateoflisting', 'paidupvalue', 'marketlot']
+        new_cols = ['isin', 'symbol', 'name', 'sector', 'facevalue', 'series', 'dateoflisting', 'paidupvalue', 'marketlot']
         df = df[new_cols]
         df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
         return df

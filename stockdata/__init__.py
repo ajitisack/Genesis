@@ -22,10 +22,11 @@ from nse import createnseintradaymonthlyfile
 from nse import loadnseintradayfile
 from nse import downloadnseintradaytoday
 
+from nse import loadtechnicals
+
 from techindicators import addIndicators
 from techindicators import addMA
 
-from summary import loadbasicsummary
 from streamnseprices import streamnseprices
 
 from charts import chart
