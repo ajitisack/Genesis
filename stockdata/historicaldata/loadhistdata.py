@@ -16,8 +16,9 @@ class HistData(HistDataDict, Config):
 
     @SqLite.connector
     def getsymbols(self, exchange, n_symbols):
-        tblname = self.tbl_nsesymbols
-        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from {tblname} "
+        # tblname = self.tbl_nsesymbols
+        tblname = 'symbols'
+        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from {tblname} where infno = 1 "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)
@@ -25,7 +26,6 @@ class HistData(HistDataDict, Config):
     def processdf(self, df):
         df['date'] = df['date'].apply(lambda x: arrow.get(x).format('YYYY-MM-DD'))
         df['symbol'] = df['symbol'].apply(lambda x: x.split('.')[0].replace('^', ''))
-        # df['exchange'] = df['exchange'].apply(lambda x: x.replace('NSI', 'NSE'))
         df = Utility.adddatefeatures(df)
         df = Utility.reducesize(df)
         df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
@@ -51,8 +51,8 @@ class HistData(HistDataDict, Config):
         events    = self.processdf(events).dropna()
         histprice = histprice.astype({'volume': int})
         print('Completed!')
-        if not loadtotable: return histprice, actions
+        if not loadtotable: return histprice, events
         SqLite.loadtable(histprice, tbl_hprice)
-        SqLite.createindex(tbl_hprice, 'symbol')
+        # SqLite.createindex(tbl_hprice, 'symbol')
         SqLite.loadtable(events, tbl_actions)
         # SqLite.createindex(tbl_actions, 'symbol')

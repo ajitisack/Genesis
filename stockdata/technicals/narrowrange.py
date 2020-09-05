@@ -7,9 +7,9 @@ from stockdata.sqlite import SqLite
 class NarrowRange():
 
     @SqLite.connector
-    def createnr479(self):
+    def createnr479(self, date):
         tblname = self.tbl_nsehprice
-        query = f"select distinct date from {tblname} order by 1 desc limit 9"
+        query = f"select distinct date from {tblname} where date <= '{date}' order by 1 desc limit 9"
         x = pd.read_sql(query, SqLite.conn).date.to_list()
         dts = "'"+ "','".join(x) + "'"
         query = f"select date, symbol, open, low, high, close from {tblname} where date in ({dts})"

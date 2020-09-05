@@ -12,7 +12,6 @@ class IntraDayDataDict():
             hist = {}
             hist['timestamp'] = data.get('timestamp')
             hist['symbol'] = data.get('meta').get('symbol')
-            # hist['exchange'] = data.get('meta').get('exchangeName')
             hist['open'] = quotes.get('open')
             hist['low'] = quotes.get('low')
             hist['high'] = quotes.get('high')

@@ -32,9 +32,10 @@ class BasicTechnicals():
         return df
 
     @SqLite.connector
-    def createbasictechnicals(self):
+    def createbasictechnicals(self, date):
         tblname = self.tbl_nsehprice
-        query = f"select distinct date from {tblname} order by 1 desc limit 2"
+        query = f"select distinct date from {tblname} where date <= '{date}' order by 1 desc limit 2"
+        print(query)
         currdt, prevdt = pd.read_sql(query, SqLite.conn).date.to_list()
         query = f"select date, symbol, open, low, high, close, volume from {tblname} where date in ('{currdt}', '{prevdt}')"
         df = pd.read_sql(query, SqLite.conn)

@@ -15,10 +15,11 @@ class Technicals(Config, BasicTechnicals, NarrowRange, PivotPoints):
         Config.__init__(self)
 
     @Utility.timer
-    def loadtechnicals(self, loadtotable=True):
+    def loadtechnicals(self, date, loadtotable=True):
         tblname = self.tbl_nsetechnicals
-        df1 = self.createbasictechnicals()
-        df2 = self.createnr479()
+        tblname = tblname if date == arrow.now().format('YYYY-MM-DD') else f"{tblname}_{date.replace('-', '')}"
+        df1 = self.createbasictechnicals(date)
+        df2 = self.createnr479(date)
         df = pd.merge(df1, df2, how='outer', on='symbol')
         df = self.createpivotpoints(df)
         df = Utility.reducesize(df)

@@ -1,6 +1,7 @@
 import json
 import requests
 import arrow
+import time
 from requests.adapters import HTTPAdapter
 
 from stockdata.sdlogger import SDLogger
@@ -14,12 +15,11 @@ class HistDataDict(SDLogger):
             hist = {}
             hist['date'] = data.get('timestamp')
             hist['symbol'] = data.get('meta').get('symbol')
-            # hist['exchange'] = data.get('meta').get('exchangeName')
             hist['open'] = quotes.get('open')
             hist['low'] = quotes.get('low')
             hist['high'] = quotes.get('high')
             hist['close'] = quotes.get('close')
-            # hist['adjclose'] = quotes.get('adjclose')[0].get('adjclose')
+            hist['adjclose'] = data.get('indicators').get('adjclose')[0].get('adjclose')
             hist['volume'] = quotes.get('volume')
             return hist
         except:
@@ -29,7 +29,7 @@ class HistDataDict(SDLogger):
         events = data.get('events')
         div = events.get('dividends') if events else ''
         if div is None or div == '': return {}
-        dividends = {'symbol' : data.get('meta').get('symbol'), 'exchange': data.get('meta').get('exchangeName')}
+        dividends = {'symbol' : data.get('meta').get('symbol')}
         dividends['date'] = [div.get(k).get('date') for k, v in div.items()]
         dividends['action'] = 'dividend'
         dividends['value'] = [div.get(k).get('amount') for k, v in div.items()]
@@ -39,7 +39,7 @@ class HistDataDict(SDLogger):
         events = data.get('events')
         splits = events.get('splits') if events else ''
         if splits is None or splits == '': return {}
-        d_splits = {'symbol' : data.get('meta').get('symbol'), 'exchange': data.get('meta').get('exchangeName')}
+        d_splits = {'symbol' : data.get('meta').get('symbol')}
         d_splits['date'] = [splits.get(k).get('date') for k, v in splits.items()]
         d_splits['action'] = 'splits'
         d_splits['value'] = [splits.get(k).get('numerator')/splits.get(k).get('denominator') for k, v in splits.items()]
@@ -48,9 +48,11 @@ class HistDataDict(SDLogger):
     def getchartresult(self, symbol, startdt):
         params = {}
         params['period1']  = arrow.get(startdt).timestamp
-        params['period2']  = arrow.now().shift(days=1).timestamp
+        params['period2']  = 9999999999
+        # params['period2']  = arrow.now().shift(days=1).timestamp
         params['interval'] = '1d'
-        params['events']   = 'history,div,split'
+        params['events']   = 'div,split'
+        params['includePrePost'] = 'true'
         url = f'{self.yfqueryurl}/{symbol}'
         with requests.Session() as session:
             session.mount(url, HTTPAdapter(max_retries=self.request_max_retries))

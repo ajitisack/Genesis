@@ -42,7 +42,7 @@ class Symbols(SDLogger, Config):
         df['dateoflisting'] = pd.to_datetime(df['dateoflisting'])
         # re-order columns
         df.sort_values('symbol', inplace=True, ignore_index=True)
-        new_cols = ['isin', 'symbol', 'name', 'sector', 'facevalue', 'series', 'dateoflisting', 'paidupvalue', 'marketlot']
+        new_cols = ['isin', 'symbol', 'name', 'facevalue', 'series', 'dateoflisting', 'paidupvalue', 'marketlot']
         df = df[new_cols]
         df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
         return df

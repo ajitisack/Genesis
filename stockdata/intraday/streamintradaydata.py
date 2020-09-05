@@ -17,8 +17,8 @@ class StreamIntraDayData(IntraDayDataDict, Config):
 
     @SqLite.connector
     def getsymbols(self, exchange, n_symbols):
-        tblname = self.tbl_nsesymbols
-        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from {tblname}"
+        tblname = 'symbols'
+        if exchange == 'NSE': query = f"select symbol || '.NS' as symbol from {tblname} where infno = 1 "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)

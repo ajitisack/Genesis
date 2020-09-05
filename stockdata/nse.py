@@ -50,5 +50,5 @@ def downloadnsesymboldetailsyf(n_symbols=0, loadtotable=True):
 def downloadnsesymboldetailsmc(n_symbols=0, loadtotable=True):
     return MoneyControl().downloaddetails('NSE', n_symbols, loadtotable)
 
-def loadtechnicals(loadtotable=True):
-    return Technicals().loadtechnicals(loadtotable)
+def loadtechnicals(date=arrow.now().format('YYYY-MM-DD'), loadtotable=True):
+    return Technicals().loadtechnicals(date, loadtotable)
