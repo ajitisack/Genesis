@@ -18,11 +18,14 @@ class Technicals(Config, BasicTechnicals, NarrowRange, PivotPoints):
     def loadtechnicals(self, date, loadtotable=True):
         tblname = self.tbl_nsetechnicals
         tblname = tblname if date == arrow.now().format('YYYY-MM-DD') else f"{tblname}_{date.replace('-', '')}"
+        print(f'Calculating technicals based on price values for NSE symbols as of {date}', end='...', flush=True)
         df1 = self.createbasictechnicals(date)
         df2 = self.createnr479(date)
         df = pd.merge(df1, df2, how='outer', on='symbol')
         df = self.createpivotpoints(df)
+        df = self.createtomorrowpivotpoints(df)
         df = Utility.reducesize(df)
         df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
+        print('Completed!')
         if not loadtotable: return df
         SqLite.loadtable(df, tblname)

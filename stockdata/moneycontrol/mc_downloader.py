@@ -33,8 +33,8 @@ class MoneyControl(SDLogger, Config, SymbolDetails):
 
     @SqLite.connector
     def getsymbols(self, exchange, n_symbols):
-        tblname = self.tbl_symbols
-        if exchange == 'NSE': query = f"select symbol, isin from {tblname} where innse = 1 "
+        tblname = self.tbl_nsesymbols
+        if exchange == 'NSE': query = f"select symbol, isin from {tblname} "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df['isin'])

@@ -32,6 +32,6 @@ class NarrowRange():
         df['NR4'] = df.apply(lambda x: 1 if x['tr'] < x['tr1d'] and x['tr'] < x['tr2d'] and x['tr'] < x['tr3d'] else 0, axis=1)
         df['NR7'] = df.apply(lambda x: 1 if x['NR4'] == 1 and x['tr'] < x['tr4d'] and x['tr'] < x['tr5d'] and x['tr'] < x['tr6d'] else 0, axis=1)
         df['NR9'] = df.apply(lambda x: 1 if x['NR7'] == 1 and x['tr'] < x['tr7d'] and x['tr'] < x['tr8d'] else 0, axis=1)
-        df.drop(['date', 'open', 'low', 'high', 'close'], axis=1, inplace=True)
+        df.drop(['date', 'open', 'low', 'high', 'close', 'prevhigh', 'prevlow'], axis=1, inplace=True)
         df.reset_index(drop=True, inplace=True)
         return df

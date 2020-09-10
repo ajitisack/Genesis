@@ -65,6 +65,7 @@ class Utility():
         df[int_cols] = df[int_cols].apply(lambda x: pd.to_numeric(x, errors='ignore', downcast='integer'))
         # round float columns to 2 decimal places
         float_cols = df.select_dtypes(include=['float64', 'float32']).columns
+        float_cols = float_cols[~float_cols.str.endswith('pct')]
         df[float_cols] = df[float_cols].apply(lambda x: round(x, 2))
         return df
 
