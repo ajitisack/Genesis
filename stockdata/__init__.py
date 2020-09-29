@@ -1,34 +1,35 @@
-from main import downloadsymbols
-from main import loadtotable
-from main import searchsymbol
-from main import getdata
-from main import getnsehistprice
-from main import getweeklynsehistprice
-from main import getmonthlynsehistprice
-from main import getyearlynsehistprice
+from stockdata.main import downloadsymbols
+from stockdata.main import loadtotable
+from stockdata.main import searchsymbol
+from stockdata.main import getdata
+from stockdata.main import getnsehistprice
+from stockdata.main import getweeklynsehistprice
+from stockdata.main import getmonthlynsehistprice
+from stockdata.main import getyearlynsehistprice
 
-from nse import downloadnsepreopendata
-from nse import downloadnsefnostockscurrentprice
-from nse import downloadnseallindicescurrentprice
+from stockdata.nse import downloadnsepreopendata
+from stockdata.nse import downloadnsefnostockscurrentprice
+from stockdata.nse import downloadnseallindicescurrentprice
+from stockdata.nse import downloadmysymbolscurrentprice
 
-from nse import downloadnsehistdata
-from nse import downloadnseindices
+from stockdata.nse import downloadnsehistdata
+from stockdata.nse import downloadnseindices
 
-from nse import downloadnsesymboldetailsyf
-from nse import downloadnsesymboldetailsmc
+from stockdata.nse import downloadnsesymboldetailsyf
+from stockdata.nse import downloadnsesymboldetailsmc
 
-from nse import downloadnseintradaydata
-from nse import createnseintradaymonthlyfile
-from nse import loadnseintradayfile
-from nse import downloadnseintradaytoday
+from stockdata.nse import downloadnseintradaydata
+from stockdata.nse import createnseintradaymonthlyfile
+from stockdata.nse import loadnseintradayfile
+from stockdata.nse import downloadnseintradaytoday
 
-from nse import loadtechnicals
+from stockdata.nse import loadtechnicals
 
-from techindicators import addIndicators
-from techindicators import addMA
+from stockdata.techindicators import addIndicators
+from stockdata.techindicators import addMA
 
-from streamnseprices import streamnseprices
+from stockdata.streamnseprices import streamnseprices
 
-from charts import chart
-from charts import nsechart
-from charts import nseindexsymbolschart
+from stockdata.charts import chart
+from stockdata.charts import nsechart
+from stockdata.charts import nseindexsymbolschart

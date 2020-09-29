@@ -7,11 +7,12 @@ create view symbols as
     select 
       a.isin
     , a.symbol
-    , case when d.symbol is null then 0 else 1 end inhotlist
+    , case when e.symbol is null then 0 else 1 end inhotlist
     , case when b.symbol is null then 0 else 1 end infno
     , case when c.symbol is null then 0 else 1 end innifty50
+	, case when d.symbol is null then 0 else 1 end innifty100
     , a.name
-    , d.sector
+    , e.sector
     , a.facevalue
     , a.series
     , a.dateoflisting
@@ -21,7 +22,8 @@ create view symbols as
     from NSE_EquitySymbols a
         left outer join NSE_EquityFNOCurrentPrice b on a.symbol = b.symbol
         left outer join NSE_Indices c on a.symbol = c.symbol and c.indexname = 'Nifty 50'
-        left outer join NSE_Watchlist d on a.symbol = d.symbol 
+		left outer join NSE_Indices d on a.symbol = d.symbol and d.indexname = 'Nifty 100'
+        left outer join NSE_MyWatchlist e on a.symbol = e.symbol 
     where 1 = 1
 ;
 
@@ -38,23 +40,23 @@ create view histprice as
     where 1 = 1
 ;
 
-/*
+
 drop view if exists profilemc;
 create view profilemc as
-    select *
-    from NSE_EquityProfileMoneyControl
+    select b.symbol, b.name,  b.sector NiftySector, b.innifty50, b.innifty100,  a.sector, marketcap, [52wh] yearhigh, [52wl] yearlow, open, volume, avgprice, prevdate, currentprice, prevclose, pricechange, pricepctchange, lclimit, uclimit, pe, industrype, totalshares, b.runts
+    from NSE_EquityProfileMoneyControl a
+		left outer join symbols b on a.isin = b.isin
     where 1 = 1
 ;
-*/
 
-/*
+
 drop view if exists profileyf;
 create view profileyf as
     select *
     from NSE_EquityProfileYahooFinance
     where 1 = 1
 ;
-*/
+
 
 
 /*drop view if exists intradayhist;
@@ -118,15 +120,14 @@ create view preopen as
     select 
        b.sector
      , a.symbol
-     , a.openingtype
      , a.prevclose
      , a.open
---     , a.pricechange
-     , (a.pricechangepct/100) changepct
+     , a.pricechange
+     , round(a.pricechangepct,2) changepct
      , a.volume
      , a.volume * a.open value
      , c.cpr
-     , (c.cpr/a.open) cpr_pct
+     , round(((c.cpr/a.open) * 100), 2) cpr_pct
      , case  when a.open > R3  then 'Above R3'
              when a.open < r3  and  a.open > r2 then 'Above R2'
              when a.open = r2  then 'On R2'
@@ -151,7 +152,6 @@ create view preopen as
      , b.inhotlist
      , b.innifty50
      , b.infno
-     , time
      , a.runts
     from NSE_EquityMarketPreOpen a
         join symbols b on a.symbol = b.symbol
@@ -170,34 +170,28 @@ create view currentprice as
     select
 --      a.time
 --    , b.name
-      strftime('%H:%S', a.time) time
+      strftime('%H:%S', a.runts) time
     , b.sector
     , a.symbol
---    , case when a.open > a.prevclose then 'Gap-Up' when a.prevclose < a.open then 'Gap-Down' else 'No-Gap' end openingtype
-    , a.prevclose
-    , (d.pricechangepct/100) openchangepct
-    , case when a.lastprice >= a.open then 'Up'else 'Down' end trend
---    , a.pricechange
     , a.open, a.low, a.high
     , round(cast(a.volume as REAL)/10000000, 2) volume
-    , round((cast(a.volume as REAL) * (a.open + a.low + a.high + a.lastprice)/4)/1000000, 2) value
-    , a.lastprice ltp
-    , (a.lastprice-a.open)/a.open ltptoopenchangepct
-    , (a.pricechangepct/100) changepct
-    , cpr, (cpr/a.lastprice) cpr_pct
-    , case   when a.lastprice > R3  then 'Above R3'
-             when a.lastprice < r3  and  a.lastprice > r2 then 'Above R2'
-             when a.lastprice = r2  then 'On R2'
-             when a.lastprice < r2  and  a.lastprice >= r1 then 'Above R1'
-             when a.lastprice = r1  then 'On R1'
-             when a.lastprice > tc  then 'Below R1; Above CPR'
-             when a.lastprice <= tc and  a.lastprice >= bc then 'Within CPR'           
-             when a.lastprice > s1  then 'Above S1; Below CPR'
-             when a.lastprice = s1  then 'On S1'             
-             when a.lastprice > s2  and  a.lastprice < s1 then 'Above S2'
-             when a.lastprice = s2  then 'On S2'
-             when a.lastprice > s3  and  a.lastprice < s2 then 'Above S3'
-             when a.lastprice = s2  then 'On S3'
+    , round((cast(a.volume as REAL) * (a.open + a.low + a.high + a.ltp)/4)/1000000, 2) value
+    , a.ltp
+    , (a.ltp-a.open)/a.open ltptoopenchangepct
+    , cpr, (cpr/a.ltp) cpr_pct
+    , case   when a.ltp > R3  then 'Above R3'
+             when a.ltp < r3  and  a.ltp > r2 then 'Above R2'
+             when a.ltp = r2  then 'On R2'
+             when a.ltp < r2  and  a.ltp >= r1 then 'Above R1'
+             when a.ltp = r1  then 'On R1'
+             when a.ltp > tc  then 'Below R1; Above CPR'
+             when a.ltp <= tc and  a.ltp >= bc then 'Within CPR'           
+             when a.ltp > s1  then 'Above S1; Below CPR'
+             when a.ltp = s1  then 'On S1'             
+             when a.ltp > s2  and  a.ltp < s1 then 'Above S2'
+             when a.ltp = s2  then 'On S2'
+             when a.ltp > s3  and  a.ltp < s2 then 'Above S3'
+             when a.ltp = s2  then 'On S3'
              else 'Below S3' end pricestatus
     , c.low as prevlow
     , c.high as prevhigh

@@ -19,6 +19,14 @@ class Utility():
         .replace('*', '')\
         .replace('LTD.','LTD')
 
+    def asfloat(n):
+        if n == '-': return 0
+        return float(n.replace(',', ''))
+
+    def asint(n):
+        if n == '-': return 0
+        return int(n.replace(',', ''))
+
     @staticmethod
     def adddatefeatures(df):
         df['date']  = pd.to_datetime(df['date'], format='%Y-%m-%d')
@@ -26,7 +34,7 @@ class Utility():
         df['month'] = df['date'].dt.month
         df['day']   = df['date'].dt.day
         df['wkday'] = df['date'].dt.dayofweek + 1
-        df['wknr']  = df['date'].dt.week
+        df['wknr']  = df['date'].dt.isocalendar().week
         df['qrtr']  = df['date'].dt.quarter
         df['date']  = df['date'].dt.date
         return df
@@ -49,7 +57,7 @@ class Utility():
         df['month']   = df['timestamp'].dt.month
         df['day']     = df['timestamp'].dt.day
         df['wkday']   = df['timestamp'].dt.dayofweek + 1
-        df['wknr']    = df['timestamp'].dt.week
+        df['wknr']    = df['timestamp'].dt.isocalendar().week
         df['qrtr']    = df['timestamp'].dt.quarter
         df['time']    = df['timestamp'].dt.time
         df['after12'] = df['time'].apply(lambda x: 1 if x >= datetime.time(12,0) else 0)

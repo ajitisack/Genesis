@@ -57,6 +57,6 @@ class BasicTechnicals():
         df = self.pricechange(df)
         df = self.volumechange(df)
         df = df[df.date == currdt]
-        df = df[df.prevclose!=0]
+        # df = df[df.prevclose!=0]
         df = self.othertechnicals(df)
         return df

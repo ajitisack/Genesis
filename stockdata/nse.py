@@ -10,6 +10,7 @@ from stockdata.indices.download_indices_symbols import IndicesSymbols
 from stockdata.yahoofinance.yf_downloader import YahooFinance
 from stockdata.moneycontrol.mc_downloader import MoneyControl
 from stockdata.technicals.load_technicals import Technicals
+from stockdata.yahoofinance.load_currentprice import CurrentMarketPrice
 
 # to download historical prices and events of NSE symbols
 def downloadnsehistdata(n_symbols=0, loadtotable=True, startdt='1970-01-01'):
@@ -37,6 +38,9 @@ def downloadnsepreopendata():
 
 def downloadnsefnostockscurrentprice():
     return CurrentPriceFNOSymbols().download()
+
+def downloadmysymbolscurrentprice():
+    return CurrentMarketPrice().download()
 
 def downloadnseallindicescurrentprice():
     return CurrentPriceAllIndices().download()

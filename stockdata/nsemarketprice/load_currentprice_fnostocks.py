@@ -18,10 +18,11 @@ class CurrentPriceFNOSymbols(CurrentPrice, Config):
     @Utility.timer
     def download(self):
         tblname = self.tbl_nseeqcurrent
+        url = self.nse_equitypriceurl
         print(f'Downloading Current Price of NSE SECURITIES IN F&O', end='...', flush=True)
-        json_str = self.getjsonstr('SECURITIES IN F&O')
-        df = self.getcurrentprice(json_str)
+        json_str = self.getjsonstr(url)
+        df = self.getsymbolscurrentprice(json_str)
         df = Utility.reducesize(df)
         df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
-        print(f'Completed')
+        print(f'Completed !')
         SqLite.loadtable(df, tblname)

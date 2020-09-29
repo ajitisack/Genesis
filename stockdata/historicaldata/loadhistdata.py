@@ -65,7 +65,7 @@ class HistData(HistDataDict, Config):
         histprice = self.processdf(histprice).dropna()
         events    = self.processdf(events).dropna()
         histprice = histprice.astype({'volume': int})
-        print('Completed!')
+        print('Completed !')
         if not loadtotable: return histprice, events
         SqLite.loadtable(histprice, tbl_hprice)
         # SqLite.createindex(tbl_hprice, 'symbol')
