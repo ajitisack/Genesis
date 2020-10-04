@@ -28,13 +28,8 @@ class CurrentPrice(SDLogger):
 
     def getchartresult(self, sector, symbol):
         symbol   = f'{symbol}' if sector == 'Index' else f'{symbol}.NS'
-        today = arrow.now().format('YYYY-MM-DD')
-        period1  = arrow.get(today).timestamp
-        period2  = 9999999999
         interval = '1d'
-        prepost  = 'true'
-        url      = f'{self.yfqueryurl}/{symbol}?symbol={symbol}&period1={period1}&period2={period2}&interval={interval}&includePrePost={prepost}'
-        # print(url)
+        url      = f'{self.yfqueryurl}/{symbol}?symbol={symbol}&interval={interval}'
         response = requests.get(url)
         return json.loads(response.text)
 

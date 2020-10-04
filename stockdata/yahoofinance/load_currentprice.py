@@ -1,5 +1,7 @@
 import pandas as pd
 import arrow
+from itertools import repeat
+from concurrent.futures import ThreadPoolExecutor
 
 from stockdata.config import Config
 from stockdata.sqlite import SqLite
@@ -17,15 +19,20 @@ class CurrentMarketPrice(CurrentPrice, Config):
         query = f"select sector, symbol symbol from {tblname}"
         df = pd.read_sql(query, SqLite.conn)
         symbols = zip(df.sector, df.symbol)
-        return symbols
+        return list(symbols)
 
     @Utility.timer
     def download(self):
         print(f"Downloading current price of intraday watchlist symbols for {arrow.now().format('YYYY-MM-DD')}", end='...', flush=True)
         tblname = 'NSE_MyWatchlistCurrentPrice'
         equitypriceurl = self.nse_equitypriceurl
-        symbols = self.getsymbols()
-        data = [self.gethistdata(s) for s in symbols]
+        symbols_list = self.getsymbols()
+        # data = [self.gethistdata(s) for s in symbols_list]
+        # nthreads = 5
+        nthreads = min(len(symbols_list), int(self.maxthreads))
+        with ThreadPoolExecutor(max_workers=nthreads) as executor:
+            results = executor.map(self.gethistdata, symbols_list)
+        data = list(results)
         df = pd.DataFrame(data)
         df = df.astype({'volume': int})
         df = Utility.reducesize(df)
