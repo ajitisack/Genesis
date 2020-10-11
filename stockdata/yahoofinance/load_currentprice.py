@@ -15,9 +15,15 @@ class CurrentMarketPrice(CurrentPrice, Config):
 
     @SqLite.connector
     def getsymbols(self):
-        tblname = 'NSE_MyWatchlist'
-        query = f"select sector, symbol symbol from {tblname}"
+        # tblname = 'NSE_MyWatchlist'
+        # query = f"select sector, symbol from {tblname}"
+        tblname = 'symbols'
+        query = f"select sector, symbol from {tblname} where infno = 1"
         df = pd.read_sql(query, SqLite.conn)
+        indices = ['^NSEI', '^NSEBANK', '^CNXIT', '^CNXAUTO', '^CNXPHARMA', '^CNXMETAL']
+        indices = pd.DataFrame({'symbol' : indices})
+        indices.insert(0, 'sector', 'Index')
+        df = df.append(indices, ignore_index=True)
         symbols = zip(df.sector, df.symbol)
         return list(symbols)
 

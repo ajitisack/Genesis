@@ -14,3 +14,4 @@ ppt/*
 intradaydata/*
 nse_market_preopen_data/*
 .DS_Store
+stockdata.db-journal
