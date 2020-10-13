@@ -20,7 +20,7 @@ class CurrentMarketPrice(CurrentPrice, Config):
         tblname = 'symbols'
         query = f"select sector, symbol from {tblname} where infno = 1"
         df = pd.read_sql(query, SqLite.conn)
-        indices = ['^NSEI', '^NSEBANK', '^CNXIT', '^CNXAUTO', '^CNXPHARMA', '^CNXMETAL']
+        indices = ['^NSEI', '^NSEBANK', '^CNXIT', '^CNXAUTO', '^CNXPHARMA', '^CNXMETAL', '^CNXFMCG', '^CNXFIN', '^CNXREALTY', '^CNXMEDIA']
         indices = pd.DataFrame({'symbol' : indices})
         indices.insert(0, 'sector', 'Index')
         df = df.append(indices, ignore_index=True)

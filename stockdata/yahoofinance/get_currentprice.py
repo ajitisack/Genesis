@@ -6,7 +6,18 @@ from requests.adapters import HTTPAdapter
 
 from stockdata.sdlogger import SDLogger
 
-d = {'^NSEI':'Nifty 50', '^CNXAUTO':'Auto', '^NSEBANK':'Banks', '^CNXPHARMA':'Pharma', '^CNXMETAL':'Metal', '^CNXIT':'IT'}
+d = {'^NSEI':'Nifty 50'
+    , '^CNXAUTO':'Auto'
+    , '^NSEBANK':'Banks'
+    , '^CNXPHARMA':'Pharma'
+    , '^CNXMETAL':'Metal'
+    , '^CNXIT':'IT'
+    , '^CNXFMCG':'FMCG'
+    , '^CNXREALTY':'Realty'
+    , '^CNENERGY':'Energy'
+    , '^CNXFIN':'Fin Serv'
+    , '^CNXMEDIA':'Media'
+    }
 
 class CurrentPrice(SDLogger):
 
