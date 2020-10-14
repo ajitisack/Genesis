@@ -4,7 +4,7 @@ import pandas as pd
 pd.options.display.float_format = '{:,.2f}'.format
 
 query = """
-select symbol, high pdh, low pdl
+select symbol, innifty50, high pdh, low pdl
 from technicals
 where infno = 1
 """
@@ -43,20 +43,28 @@ def getprice(rpt=100, risk=0.5):
     df = pd.merge(df, pdhl, how = 'outer', on = 'symbol')
     df['ohl'] = df.apply(lambda x: getohlstatus(x), axis = 1)
     df['qty'] = df.apply(lambda x: round(rpt/(x['ltp']*risk), 0), axis = 1)
-    df['slb'] = df['ltp'].apply(lambda x: round(x+(x*risk),2))
-    df['sls'] = df['ltp'].apply(lambda x: round(x-(x*risk),2))
-    cols = ['symbol', 'ltp', 'changepct']
-    df_indices1 = df[df.symbol == 'Nifty 50'][cols]
-    df_indices2 = df[(df.sector == 'Index') & (df.symbol != 'Nifty 50')][cols]
+    df['slb'] = df['ltp'].apply(lambda x: round(x-(x*risk),2))
+    df['sls'] = df['ltp'].apply(lambda x: round(x+(x*risk),2))
+    df_indices1 = df[df.symbol == 'Nifty 50']
+    df_indices2 = df[(df.sector == 'Index') & (df.symbol != 'Nifty 50')]
     df_indices2 = df_indices2.sort_values(by='changepct', ascending=False)
-    cols = ['sector', 'symbol', 'ltp', 'changepct', 'qty', 'slb', 'sls', 'ohl', 'pdh', 'pdl']
-    df_symbols = df[df.sector != 'Index'][cols]
-    df_banks   = df[df.sector == 'Bank'][cols].sort_values(by='changepct', ascending=False)
-    df_it      = df[df.sector == 'IT'][cols].sort_values(by='changepct', ascending=False)
-    df_auto    = df[df.sector == 'Auto'][cols].sort_values(by='changepct', ascending=False)
-    df_pharma  = df[df.sector == 'Pharma'][cols].sort_values(by='changepct', ascending=False)
-    df_metal   = df[df.sector == 'Metal'][cols].sort_values(by='changepct', ascending=False)
-    df_oilgas  = df[df.sector == 'Oil & Gas'][cols].sort_values(by='changepct', ascending=False)
-    df_finserv = df[df.sector == 'FinServ'][cols].sort_values(by='changepct', ascending=False)
-    df_others  = df[df.sector.isin(['Cement','Chemicals','Consumer'])][cols].sort_values(by='changepct', ascending=False)
-    return df_symbols, df_indices1, df_indices2, df_banks, df_it, df_auto, df_pharma, df_metal, df_oilgas, df_finserv, df_others
+    df_niftysymbols = df[df.innifty50 == 1]
+    df_symbols = df[df.sector != 'Index']
+    df_banks   = df[df.sector == 'Bank']
+    df_it      = df[df.sector == 'IT']
+    df_auto    = df[df.sector == 'Auto']
+    df_pharma  = df[df.sector == 'Pharma']
+    df_metal   = df[df.sector == 'Metal']
+    df_oilgas  = df[df.sector == 'Oil & Gas']
+    df_finserv = df[df.sector == 'FinServ']
+    df_telecom = df[df.sector == 'Telecom']
+    df_trans   = df[df.sector == 'Transportation']
+    df_cement  = df[df.sector == 'Cement']
+    df_chemic  = df[df.sector == 'Chemicals']
+    df_media   = df[df.sector == 'Media']
+    df_power   = df[df.sector == 'Power']
+    return_lst = [df_symbols, df_indices1, df_indices2, df_niftysymbols,
+                  df_banks, df_it, df_auto, df_pharma, df_metal, df_oilgas,
+                  df_finserv, df_telecom, df_trans, df_cement, df_chemic,
+                  df_media, df_power]
+    return return_lst
