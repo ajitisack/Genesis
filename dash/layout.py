@@ -22,10 +22,10 @@ tab_selected_style = {
 }
 
 def printtitle(title):
-    return html.Div(title, style = {'color': 'rgb(200, 200, 200)', 'text-align':'center', 'font-family' : 'Verdana', 'font-weight' : '14', 'padding':'20px'})
+    return html.Div(title, style = {'color': 'rgb(200, 200, 200)', 'text-align':'center', 'font-family' : 'Verdana', 'font-weight' : '12', 'padding':'20px'})
 
 def sectortitle(title):
-    return html.Div(title, style = {'color': 'rgb(200, 200, 200)', 'text-align':'left', 'font-family' : 'Verdana', 'padding-top': '20px', 'font-weight' : '14'})
+    return html.Div(title, style = {'color': 'rgb(200, 200, 200)', 'text-align':'left', 'font-family' : 'Verdana', 'padding-top': '20px', 'font-weight' : '12'})
 
 
 tbl_header_style = {
@@ -50,59 +50,53 @@ def pricetbl(table_id, df):
         , {'name':'LTP' , 'id': 'ltp'}
         , {'name':'%Chng' , 'id': 'changepct'}
         , {'name':'Qty' , 'id': 'qty'}
-        , {'name':'SL' , 'id': 'slb'}
+        , {'name':'SL' , 'id': 'sl'}
     ]
-    if table_id in ('up_tbl', 'down_tbl', 'nifty_up_tbl', 'nifty_down_tbl'):
+    if table_id in ('nifty_adv_tbl', 'nifty_dec_tbl', 'fno_adv_tbl', 'fno_dec_tbl'):
         cols = [{'name':'Sector', 'id': 'sector'}] + cols
 
     return dash_table.DataTable(
-        id = table_id,
-        columns= cols,
-        # fixed_rows={'headers': True},
-        # style_table={
-        #     'width' : 500
-        # },
-        style_header = tbl_header_style,
-        style_cell = tbl_cell_style,
-        style_cell_conditional=[
+          id = table_id
+        , columns = cols
+        , style_table = {
+            'width' : 420
+        }
+        , style_header = tbl_header_style
+        , style_cell = tbl_cell_style
+        , style_cell_conditional=[
             {
                 'if': {'column_id': ['sector', 'symbol', 'pricelevel']}
                 , 'textAlign': 'left'
-                , 'padding-left': 5
+                , 'padding-left': 6
             },
             {
-                'if': {'column_id': ['sector', 'symbol', 'ltp', 'changepct', 'volume']}
-                , 'color' : 'lightgreen'
-            },
-            {
-                'if': {'column_id': ['slb', 'sls', 'qty', 'changepct', 'ltp']},
-                'textAlign': 'right',
-                'padding-right': 10
+                'if': {'column_id': ['sl', 'qty', 'changepct', 'ltp']}
+                , 'textAlign': 'right'
+                , 'padding-right': 8
             },
             {
                 'if': {'column_id': ['qty']}
                 , 'color' : 'dodgerblue'
             },
-        ],
-        style_data_conditional=[
+        ]
+        , style_data_conditional=[
             {
                 'if': {
                     'filter_query': '{changepct} >= 0',
-                    'column_id': ['sector', 'symbol', 'ltp', 'changepct', 'volume']
+                    'column_id': ['sector', 'symbol', 'ltp', 'changepct']
                 }
                 , 'color' : 'lightgreen'
             },
             {
                 'if': {
                     'filter_query': '{changepct} < 0',
-                    'column_id': ['sector', 'symbol', 'ltp', 'changepct', 'volume']
+                    'column_id': ['sector', 'symbol', 'ltp', 'changepct']
                 }
                 , 'color' : 'tomato'
             },
             {
                 'if': {
                     'filter_query': '{ohl} = "OL"',
-                    # 'filter_query': '{ltp} > {pdh}',
                     'column_id': ['symbol']
                 }
                 , 'backgroundColor': 'lightgreen'
@@ -111,15 +105,14 @@ def pricetbl(table_id, df):
             {
                 'if': {
                     'filter_query': '{ohl} = "OH"',
-                    # 'filter_query': '{ltp} < {pdl}',
                     'column_id': ['symbol']
                 }
                 , 'backgroundColor': 'tomato'
                 , 'color' : 'black'
             },
-        ],
-        style_as_list_view=True,
-        data = df.to_dict('records'),
+        ]
+        , style_as_list_view=True
+        , data = df.to_dict('records')
     )
 
 

@@ -4,7 +4,7 @@ import pandas as pd
 pd.options.display.float_format = '{:,.2f}'.format
 
 query = """
-select symbol, innifty50, high pdh, low pdl
+select symbol, innifty50, infno, high pdh, low pdl
 from technicals
 where infno = 1
 """
@@ -31,11 +31,29 @@ def getohlstatus(x):
     return ''
 
 
+def getsectorsymbols(df, sector):
+    n50_sector_adv = df[(df.sector == sector) & (df.innifty50 == 1) & (df.changepct >=0)].sort_values(by='changepct', ascending=False)
+    n50_sector_dec = df[(df.sector == sector) & (df.innifty50 == 1) & (df.changepct < 0)].sort_values(by='changepct', ascending=True)
+    fno_sector_adv = df[(df.sector == sector) & (df.infno == 1) & (df.changepct >= 0)].sort_values(by='changepct', ascending=False)
+    fno_sector_dec = df[(df.sector == sector) & (df.infno == 1) & (df.changepct < 0)].sort_values(by='changepct', ascending=True)
+    d = {
+          'n50' : {'adv' : n50_sector_adv, 'dec' : n50_sector_dec}
+        , 'fno' : {'adv' : fno_sector_adv, 'dec' : fno_sector_dec}
+    }
+    return d
+
+def getsl(x, risk):
+    ltp  = x['ltp']
+    changepct = x['changepct']
+    sl_points = ltp * risk
+    if changepct >= 0: return round(ltp - sl_points, 2)
+    if changepct <  0: return round(ltp + sl_points, 2)
+
 def getprice(rpt=100, risk=0.5):
     risk = risk/100
-    df = sd.getdata("select * from  NSE_MyWatchlistCurrentPrice")
+    df   = sd.getdata("select * from  NSE_MyWatchlistCurrentPrice")
     not_reqd_symbols = ['MRF', 'SHREECEM', 'PAGEIND', 'NESTLEIND', 'BOSCHLTD', 'IDEA']
-    df = df[~df.symbol.isin(not_reqd_symbols)]
+    df   = df[~df.symbol.isin(not_reqd_symbols)]
     # df = sd.getdata("select sector, symbol, open, 0 low, 0 high, open ltp, volume, changepct from preopen where inhotlist = 1")
     # df = pd.merge(df, pivots, how = 'outer', on = 'symbol')
     # df['pricelevel'] = df.apply(lambda x: getpricelevel(x), axis = 1)
@@ -43,28 +61,30 @@ def getprice(rpt=100, risk=0.5):
     df = pd.merge(df, pdhl, how = 'outer', on = 'symbol')
     df['ohl'] = df.apply(lambda x: getohlstatus(x), axis = 1)
     df['qty'] = df.apply(lambda x: round(rpt/(x['ltp']*risk), 0), axis = 1)
-    df['slb'] = df['ltp'].apply(lambda x: round(x-(x*risk),2))
-    df['sls'] = df['ltp'].apply(lambda x: round(x+(x*risk),2))
-    df_indices1 = df[df.symbol == 'Nifty 50']
-    df_indices2 = df[(df.sector == 'Index') & (df.symbol != 'Nifty 50')]
-    df_indices2 = df_indices2.sort_values(by='changepct', ascending=False)
-    df_niftysymbols = df[df.innifty50 == 1]
-    df_symbols = df[df.sector != 'Index']
-    df_banks   = df[df.sector == 'Bank']
-    df_it      = df[df.sector == 'IT']
-    df_auto    = df[df.sector == 'Auto']
-    df_pharma  = df[df.sector == 'Pharma']
-    df_metal   = df[df.sector == 'Metal']
-    df_oilgas  = df[df.sector == 'Oil & Gas']
-    df_finserv = df[df.sector == 'FinServ']
-    df_telecom = df[df.sector == 'Telecom']
-    df_trans   = df[df.sector == 'Transportation']
-    df_cement  = df[df.sector == 'Cement']
-    df_chemic  = df[df.sector == 'Chemicals']
-    df_media   = df[df.sector == 'Media']
-    df_power   = df[df.sector == 'Power']
-    return_lst = [df_symbols, df_indices1, df_indices2, df_niftysymbols,
-                  df_banks, df_it, df_auto, df_pharma, df_metal, df_oilgas,
-                  df_finserv, df_telecom, df_trans, df_cement, df_chemic,
-                  df_media, df_power]
-    return return_lst
+    df['sl']  = df.apply(lambda x: getsl(x, risk), axis = 1)
+    dfs = {}
+    dfs['nifty50']     = df[df.symbol == 'Nifty 50']
+    dfs['indices_adv'] = df[(df.sector == 'Index') & (df.symbol != 'Nifty 50') & (df.changepct >=0)].sort_values(by='changepct', ascending=False)
+    dfs['indices_dec'] = df[(df.sector == 'Index') & (df.symbol != 'Nifty 50') & (df.changepct < 0)].sort_values(by='changepct', ascending=True)
+    dfs['nifty_adv']   = df[(df.innifty50 == 1) & (df.changepct >=0)].sort_values(by='changepct', ascending=False)
+    dfs['nifty_dec']   = df[(df.innifty50 == 1) & (df.changepct < 0)].sort_values(by='changepct', ascending=True)
+    dfs['fno_adv']     = df[df.changepct >=0].sort_values(by='changepct', ascending=False)
+    dfs['fno_dec']     = df[df.changepct < 0].sort_values(by='changepct', ascending=True)
+    dfs['bank']        = getsectorsymbols(df, 'Bank')
+    dfs['pharma']      = getsectorsymbols(df, 'Pharma')
+    dfs['it']          = getsectorsymbols(df, 'IT')
+    dfs['auto']        = getsectorsymbols(df, 'Auto')
+    dfs['autoanc']     = getsectorsymbols(df, 'Auto Ancillaries')
+    dfs['metal']       = getsectorsymbols(df, 'Metal')
+    dfs['oilgas']      = getsectorsymbols(df, 'Oil & Gas')
+    dfs['finserv']     = getsectorsymbols(df, 'Fin. Serv.')
+    dfs['power']       = getsectorsymbols(df, 'Power')
+    dfs['media']       = getsectorsymbols(df, 'Media')
+    dfs['chemi']       = getsectorsymbols(df, 'Chemicals')
+    dfs['cement']      = getsectorsymbols(df, 'Cement')
+    dfs['telecom']     = getsectorsymbols(df, 'Telecom')
+    dfs['trans']       = getsectorsymbols(df, 'Transportation')
+    dfs['realty']      = getsectorsymbols(df, 'Realty')
+    dfs['fmcg']        = getsectorsymbols(df, 'FMCG')
+    dfs['consdur']     = getsectorsymbols(df, 'Cons. Durables')
+    return dfs
