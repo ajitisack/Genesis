@@ -15,12 +15,10 @@ class CurrentMarketPrice(CurrentPrice, Config):
 
     @SqLite.connector
     def getsymbols(self):
-        # tblname = 'NSE_MyWatchlist'
-        # query = f"select sector, symbol from {tblname}"
         tblname = 'symbols'
-        query = f"select sector, symbol from {tblname} where infno = 1"
+        query = f"select sector, symbol from {tblname} where inmylist = 1"
         df = pd.read_sql(query, SqLite.conn)
-        indices = ['^NSEI', '^NSEBANK', '^CNXIT', '^CNXAUTO', '^CNXPHARMA', '^CNXMETAL', '^CNXFMCG', '^CNXFIN', '^CNXREALTY', '^CNXMEDIA']
+        indices = ['^NSEI', '^NSEBANK', '^CNXIT', '^CNXAUTO', '^CNXPHARMA', '^CNXMETAL', '^CNXFIN']
         indices = pd.DataFrame({'symbol' : indices})
         indices.insert(0, 'sector', 'Index')
         df = df.append(indices, ignore_index=True)
@@ -33,8 +31,6 @@ class CurrentMarketPrice(CurrentPrice, Config):
         tblname = 'NSE_MyWatchlistCurrentPrice'
         equitypriceurl = self.nse_equitypriceurl
         symbols_list = self.getsymbols()
-        # data = [self.gethistdata(s) for s in symbols_list]
-        # nthreads = 5
         nthreads = min(len(symbols_list), int(self.maxthreads))
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
             results = executor.map(self.gethistdata, symbols_list)

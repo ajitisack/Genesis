@@ -21,13 +21,6 @@ tab_selected_style = {
     , 'border': '1px solid rgb(40, 40, 40)'
 }
 
-def printtitle(title):
-    return html.Div(title, style = {'color': 'rgb(200, 200, 200)', 'text-align':'center', 'font-family' : 'Verdana', 'font-weight' : '12', 'padding':'20px'})
-
-def sectortitle(title):
-    return html.Div(title, style = {'color': 'rgb(200, 200, 200)', 'text-align':'left', 'font-family' : 'Verdana', 'padding-top': '20px', 'font-weight' : '12'})
-
-
 tbl_header_style = {
       'backgroundColor': 'rgb(35, 35, 35)'
     , 'color': 'rgb(180, 180, 180)'
@@ -44,119 +37,147 @@ tbl_cell_style = {
     , 'border': '1px solid rgb(40, 40, 40)'
 }
 
-def pricetbl(table_id, df):
-    cols = [
-          {'name':'Symbol', 'id': 'symbol'}
-        , {'name':'LTP' , 'id': 'ltp'}
-        , {'name':'%Chng' , 'id': 'changepct'}
-        , {'name':'Qty' , 'id': 'qty'}
-        , {'name':'SL' , 'id': 'sl'}
-    ]
-    if table_id in ('nifty_adv_tbl', 'nifty_dec_tbl', 'fno_adv_tbl', 'fno_dec_tbl'):
-        cols = [{'name':'Sector', 'id': 'sector'}] + cols
 
+conditional_cell_style = [
+    {
+        'if': {'column_id': ['sector', 'symbol', 'pricelevel']}
+        , 'textAlign': 'left'
+        , 'padding-left': 6
+    },
+    {
+        'if': {'column_id': ['sl', 'qty', 'changepct', 'ltp', 'r2r', 'value', 'gappct']}
+        , 'textAlign': 'right'
+        , 'padding-right': 8
+    },
+    {
+        'if': {'column_id': ['qty', 'r2r']}
+        , 'color' : 'dodgerblue'
+    },
+]
+
+conditional_data_style = [
+    {
+        'if': {
+            'filter_query': '{changepct} >= 0',
+            'column_id': ['sector', 'symbol', 'ltp', 'changepct']
+        }
+        , 'color' : 'lightgreen'
+    },
+    {
+        'if': {
+            'filter_query': '{changepct} < 0',
+            'column_id': ['sector', 'symbol', 'ltp', 'changepct']
+        }
+        , 'color' : 'tomato'
+    },
+    {
+        'if': {
+            'filter_query': '{ohl} = "OL"',
+            'column_id': ['symbol']
+        }
+        , 'backgroundColor': 'lightgreen'
+        , 'color' : 'black'
+    },
+    {
+        'if': {
+            'filter_query': '{ohl} = "OH"',
+            'column_id': ['symbol']
+        }
+        , 'backgroundColor': 'tomato'
+        , 'color' : 'black'
+    },
+]
+
+def printtitle(title):
+    return html.Div(title, style = {'color': 'rgb(200, 200, 200)', 'text-align':'center', 'font-family' : 'Verdana', 'font-weight' : '12', 'padding':'20px'})
+
+
+def sectortitle(title):
+    return html.Div(title, style = {'color': 'rgb(200, 200, 200)', 'text-align':'center', 'font-family' : 'Verdana', 'font-weight' : '12', 'padding-top': '10px', 'padding-left':'10px'})
+
+
+def sectortbl(table_id, df):
+    cols = [
+            {'name':'Symbol', 'id': 'symbol'}
+          , {'name':'LTP' , 'id': 'ltp'}
+          , {'name':'%Chng' , 'id': 'changepct'}
+          , {'name':'Qty' , 'id': 'qty'}
+          , {'name':'R2R' , 'id': 'r2r'}
+    ]
     return dash_table.DataTable(
           id = table_id
         , columns = cols
-        , style_table = {
-            'width' : 420
-        }
+        , style_table = {'width' : 280}
         , style_header = tbl_header_style
         , style_cell = tbl_cell_style
-        , style_cell_conditional=[
-            {
-                'if': {'column_id': ['sector', 'symbol', 'pricelevel']}
-                , 'textAlign': 'left'
-                , 'padding-left': 6
-            },
-            {
-                'if': {'column_id': ['sl', 'qty', 'changepct', 'ltp']}
-                , 'textAlign': 'right'
-                , 'padding-right': 8
-            },
-            {
-                'if': {'column_id': ['qty']}
-                , 'color' : 'dodgerblue'
-            },
-        ]
-        , style_data_conditional=[
-            {
-                'if': {
-                    'filter_query': '{changepct} >= 0',
-                    'column_id': ['sector', 'symbol', 'ltp', 'changepct']
-                }
-                , 'color' : 'lightgreen'
-            },
-            {
-                'if': {
-                    'filter_query': '{changepct} < 0',
-                    'column_id': ['sector', 'symbol', 'ltp', 'changepct']
-                }
-                , 'color' : 'tomato'
-            },
-            {
-                'if': {
-                    'filter_query': '{ohl} = "OL"',
-                    'column_id': ['symbol']
-                }
-                , 'backgroundColor': 'lightgreen'
-                , 'color' : 'black'
-            },
-            {
-                'if': {
-                    'filter_query': '{ohl} = "OH"',
-                    'column_id': ['symbol']
-                }
-                , 'backgroundColor': 'tomato'
-                , 'color' : 'black'
-            },
-        ]
+        , style_cell_conditional = conditional_cell_style
+        , style_data_conditional = conditional_data_style
+        , style_as_list_view = True
+        , data = df.to_dict('records')
+    )
+
+
+def pricetbl(table_id, df):
+    cols = [
+          {'name':'Sector', 'id': 'sector'}
+        , {'name':'Symbol', 'id': 'symbol'}
+        , {'name':'LTP' , 'id': 'ltp'}
+        , {'name':'%Chng' , 'id': 'changepct'}
+        , {'name':'%Gap' , 'id': 'gappct'}
+        , {'name':'Qty' , 'id': 'qty'}
+        , {'name':'R2R' , 'id': 'r2r'}
+    ]
+    return dash_table.DataTable(
+          id = table_id
+        , columns = cols
+        , style_table = {'width' : 500}
+        , style_header = tbl_header_style
+        , style_cell = tbl_cell_style
+        , style_cell_conditional = conditional_cell_style
+        , style_data_conditional = conditional_data_style
+        , style_as_list_view=True
+        , data = df.to_dict('records')
+    )
+
+
+def valuetbl(table_id, df):
+    cols = [
+          {'name':'Sector', 'id': 'sector'}
+        , {'name':'Symbol', 'id': 'symbol'}
+        , {'name':'LTP' , 'id': 'ltp'}
+        , {'name':'%Chng' , 'id': 'changepct'}
+        , {'name':'%Gap' , 'id': 'gappct'}
+        , {'name':'Qty' , 'id': 'qty'}
+        , {'name':'R2R' , 'id': 'r2r'}
+        , {'name':'Value' , 'id': 'value'}
+    ]
+    return dash_table.DataTable(
+          id = table_id
+        , columns = cols
+        , style_table = {'width' : 700}
+        , style_header = tbl_header_style
+        , style_cell = tbl_cell_style
+        , style_cell_conditional = conditional_cell_style
+        , style_data_conditional = conditional_data_style
         , style_as_list_view=True
         , data = df.to_dict('records')
     )
 
 
 def indicestbl(table_id, df):
-    return dash_table.DataTable(
-        id = table_id,
-        columns= [
+    cols = [
           {'name':'Index', 'id': 'symbol'}
         , {'name':'LTP' , 'id': 'ltp'}
         , {'name':'%Chng' , 'id': 'changepct'}
-        ],
-        style_table={
-            'width' : 200
-        },
-        style_header = tbl_header_style,
-        style_cell = tbl_cell_style,
-        style_cell_conditional=[
-            {
-                'if': {'column_id': ['symbol']}
-                , 'textAlign': 'left'
-                , 'padding-left': 10
-            },
-            {
-                'if': {'column_id': ['changepct', 'ltp']}
-                , 'textAlign': 'right'
-                , 'padding-right': 10
-            }
-        ],
-        style_data_conditional=[
-            {
-                'if': {
-                    'filter_query': '{changepct} < 0',
-                    'column_id': ['symbol', 'ltp', 'changepct']
-                },
-                'color' : 'tomato'
-            },
-            {
-                'if': {
-                    'filter_query': '{changepct} >= 0',
-                    'column_id': ['symbol', 'ltp', 'changepct']
-                },
-                'color' : 'lightgreen'
-            },
-        ],
-        style_as_list_view=True,
-        data = df.to_dict('records'),
+    ]
+    return dash_table.DataTable(
+          id = table_id
+        , columns = cols
+        , style_table = {'width' : 200}
+        , style_header = tbl_header_style
+        , style_cell = tbl_cell_style
+        , style_cell_conditional = conditional_cell_style
+        , style_data_conditional = conditional_data_style
+        , style_as_list_view=True
+        , data = df.to_dict('records'),
     )
