@@ -18,7 +18,7 @@ class HistData(HistDataDict, Config):
     def getsymbols(self, exchange, n_symbols):
         # tblname = self.tbl_nsesymbols
         tblname = 'symbols'
-        if exchange == 'NSE': query = f"select distinct symbol || '.NS' as symbol from {tblname} "
+        if exchange == 'NSE': query = f"select distinct symbol || '.NS' as symbol from {tblname} where innifty200 = 1 or inniftymidcap100 = 1 or inniftysmallcap100 = 1"
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         symbols = df.symbol.to_list()
@@ -53,21 +53,31 @@ class HistData(HistDataDict, Config):
 
     @Utility.timer
     def download(self, exchange, n_symbols, loadtotable, startdt):
-        tbl_hprice  = self.tbl_nsehprice
-        tbl_actions = self.tbl_nseactions
         symbols = self.getsymbols(exchange, n_symbols)
-        print(f'Downloading historical prices and events from yahoo finance for {len(symbols)} {exchange.upper()} symbols from {startdt}', end='...', flush=True)
+        print(f'Downloading historical prices(daily, weekly & monthly) and events from yahoo finance for {len(symbols)} {exchange.upper()} symbols from {startdt}', end='...', flush=True)
         data = self.downloadhistprice(symbols, startdt)
-        histprice = pd.concat([pd.DataFrame(i[0]) for i in data], ignore_index=True)
-        dividends = pd.concat([pd.DataFrame(i[1]) for i in data], ignore_index=True)
-        splits    = pd.concat([pd.DataFrame(i[2]) for i in data], ignore_index=True)
-        events    = pd.concat([dividends, splits], ignore_index=True)
-        histprice = self.processdf(histprice).dropna()
-        events    = self.processdf(events).dropna()
-        histprice = histprice.astype({'volume': int})
+
+        dlyhistprice = pd.concat([pd.DataFrame(i[0]) for i in data], ignore_index=True)
+        wlyhistprice = pd.concat([pd.DataFrame(i[1]) for i in data], ignore_index=True)
+        mlyhistprice = pd.concat([pd.DataFrame(i[2]) for i in data], ignore_index=True)
+        dividends    = pd.concat([pd.DataFrame(i[3]) for i in data], ignore_index=True)
+        splits       = pd.concat([pd.DataFrame(i[4]) for i in data], ignore_index=True)
+        events       = pd.concat([dividends, splits], ignore_index=True)
+        events       = self.processdf(events).dropna()
+
+        dlyhistprice = self.processdf(dlyhistprice).dropna()
+        wlyhistprice = self.processdf(wlyhistprice).dropna()
+        mlyhistprice = self.processdf(mlyhistprice).dropna()
+        dlyhistprice = dlyhistprice.astype({'volume': int})
+        wlyhistprice = wlyhistprice.astype({'volume': int})
+        mlyhistprice = mlyhistprice.astype({'volume': int})
+
         print('Completed !')
-        if not loadtotable: return histprice, events
-        SqLite.loadtable(histprice, tbl_hprice)
+
+        if not loadtotable: return dlyhistprice, wlyhistprice, mlyhistprice, events
+        SqLite.loadtable(dlyhistprice, self.tbl_nsehpricedly)
+        SqLite.loadtable(wlyhistprice, self.tbl_nsehpricewly)
+        SqLite.loadtable(mlyhistprice, self.tbl_nsehpricemly)
         # SqLite.createindex(tbl_hprice, 'symbol')
-        SqLite.loadtable(events, tbl_actions)
+        SqLite.loadtable(events, self.tbl_nseactions)
         # SqLite.createindex(tbl_actions, 'symbol')

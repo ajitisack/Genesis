@@ -8,7 +8,7 @@ class NarrowRange():
 
     @SqLite.connector
     def createnr479(self, date):
-        tblname = self.tbl_nsehprice
+        tblname = self.tbl_nsehpricedly
         query = f"select distinct date from {tblname} where date <= '{date}' order by 1 desc limit 9"
         x = pd.read_sql(query, SqLite.conn).date.to_list()
         dts = "'"+ "','".join(x) + "'"

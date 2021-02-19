@@ -21,12 +21,12 @@ class IntraDayDataDict():
         except:
             return {}
 
-    def getchartresult(self, symbol, date):
+    def getchartresult(self, symbol, date, interval):
         try:
             params = {}
             params['period1']  = arrow.get(date).timestamp
             params['period2']  = arrow.get(date).shift(days=1).timestamp
-            params['interval'] = '1m'
+            params['interval'] = interval
             url = f'{self.yfqueryurl}/{symbol}'
             with requests.Session() as session:
                 session.mount(url, HTTPAdapter(max_retries=self.request_max_retries))
@@ -39,6 +39,6 @@ class IntraDayDataDict():
     def getintradaydata(self, symbol, date):
         quotes = []
         symbol = symbol.upper()
-        data = self.getchartresult(symbol, date)
+        data = self.getchartresult(symbol, date, '1m')
         quotes = self.getquotes(data)
         return quotes

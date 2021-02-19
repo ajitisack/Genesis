@@ -4,15 +4,20 @@
 
 drop view if exists symbols;
 create view symbols as
-    select 
+    select
       a.isin
     , a.symbol
-    , case when e.symbol is null then 0 else 1 end inhotlist
-    , case when b.symbol is null then 0 else 1 end infno
+    , case when b.symbol is null then 0 else 1 end inhotlist
+    , fnoactivated
     , case when c.symbol is null then 0 else 1 end innifty50
 	, case when d.symbol is null then 0 else 1 end innifty100
+    , case when e.symbol is null then 0 else 1 end innifty200
+    , case when f.symbol is null then 0 else 1 end inniftymidcap50
+    , case when g.symbol is null then 0 else 1 end inniftymidcap100
+    , case when h.symbol is null then 0 else 1 end inniftysmallcap50
+    , case when i.symbol is null then 0 else 1 end inniftysmallcap100
     , a.name
-    , e.sector
+    , b.sector
     , a.facevalue
     , a.series
     , a.dateoflisting
@@ -20,10 +25,14 @@ create view symbols as
     , a.marketlot
     , a.runts
     from NSE_EquitySymbols a
-        left outer join NSE_EquityFNOCurrentPrice b on a.symbol = b.symbol
+        left outer join NSE_MyWatchlist b on a.symbol = b.symbol
         left outer join NSE_Indices c on a.symbol = c.symbol and c.indexname = 'Nifty 50'
 		left outer join NSE_Indices d on a.symbol = d.symbol and d.indexname = 'Nifty 100'
-        left outer join NSE_MyWatchlist e on a.symbol = e.symbol 
+        left outer join NSE_Indices e on a.symbol = e.symbol and e.indexname = 'Nifty 200'
+        left outer join NSE_Indices f on a.symbol = f.symbol and f.indexname = 'Nifty Midcap 50'
+        left outer join NSE_Indices g on a.symbol = g.symbol and g.indexname = 'Nifty Midcap 100'
+        left outer join NSE_Indices h on a.symbol = h.symbol and h.indexname = 'Nifty Smallcap 50'
+        left outer join NSE_Indices i on a.symbol = i.symbol and i.indexname = 'Nifty Smallcap 100'
     where 1 = 1
 ;
 
@@ -35,9 +44,11 @@ create view indices as
 
 drop view if exists histprice;
 create view histprice as
-    select *
-    from NSE_EquityHistoricalPrices
-    where 1 = 1
+    select 'd' freq, * from NSE_EquityHistoricalPricesDaily
+    union all
+    select 'w' freq, * from NSE_EquityHistoricalPricesWeekly
+    union all
+    select 'm' freq, * from NSE_EquityHistoricalPricesMonthly
 ;
 
 
@@ -82,7 +93,7 @@ create view technicals as
     , b.name
     , a.symbol
     , openingtype, openinggap, openinggappct
-    , closingtype, closinggap, closinggappct 
+    , closingtype, closinggap, closinggappct
     , close, prevclose, open, pricechange change, pricechangepct changepct
     , low, high, prevlow, prevhigh
     , round(cast(totalvalue/1000000 as REAL),2) totaltradevalue
@@ -117,7 +128,7 @@ create view technicals as
 
 drop view if exists preopen;
 create view preopen as
-    select 
+    select
        b.sector
      , a.symbol
      , a.prevclose
@@ -134,9 +145,9 @@ create view preopen as
              when a.open < r2  and  a.open >= r1 then 'Above R1'
              when a.open = r1  then 'On R1'
              when a.open > tc  then 'Below R1; Above CPR'
-             when a.open <= tc and  a.open >= bc then 'Within CPR'           
+             when a.open <= tc and  a.open >= bc then 'Within CPR'
              when a.open > s1  then 'Above S1; Below CPR'
-             when a.open = s1  then 'On S1'             
+             when a.open = s1  then 'On S1'
              when a.open > s2  and  a.open < s1 then 'Above S2'
              when a.open = s2  then 'On S2'
              when a.open > s3  and  a.open < s2 then 'Above S3'
@@ -185,9 +196,9 @@ create view currentprice as
              when a.ltp < r2  and  a.ltp >= r1 then 'Above R1'
              when a.ltp = r1  then 'On R1'
              when a.ltp > tc  then 'Below R1; Above CPR'
-             when a.ltp <= tc and  a.ltp >= bc then 'Within CPR'           
+             when a.ltp <= tc and  a.ltp >= bc then 'Within CPR'
              when a.ltp > s1  then 'Above S1; Below CPR'
-             when a.ltp = s1  then 'On S1'             
+             when a.ltp = s1  then 'On S1'
              when a.ltp > s2  and  a.ltp < s1 then 'Above S2'
              when a.ltp = s2  then 'On S2'
              when a.ltp > s3  and  a.ltp < s2 then 'Above S3'
@@ -210,6 +221,3 @@ create view currentprice as
         left outer join NSE_EquityMarketPreOpen d on a.symbol = d.symbol
     order by changepct desc
 ;
-
-
-

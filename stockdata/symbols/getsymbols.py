@@ -1,5 +1,7 @@
 import pandas as pd
 import arrow
+import requests
+import json
 from collections import defaultdict
 
 from stockdata.utils import Utility
@@ -11,6 +13,13 @@ class Symbols(SDLogger, Config):
 
     def __init__(self):
         Config.__init__(self)
+
+    def getfnosymbols(self):
+        headers = { "User-Agent": self.user_agent}
+        response = requests.get(self.nse_equitypriceurl, headers=headers)
+        json_str = json.loads(response.text)
+        fnosymbols = pd.DataFrame(json_str['data'])['symbol'].to_list()
+        return fnosymbols
 
     def cleanstr(self, str):
         return str.strip()\
@@ -31,7 +40,9 @@ class Symbols(SDLogger, Config):
         df['name'] = df['name'].apply(lambda x : self.cleanstr(x))
         # df['dateoflisting'] = df['dateoflisting'].astype('datetime64[D]')
         df.fillna('', inplace=True)
-        new_cols = ['isin', 'symbol', 'name', 'series', 'dateoflisting', 'paidupvalue', 'marketlot', 'facevalue']
+        fnosymbols = self.getfnosymbols()
+        df[['fnoactivated']] = df.apply(lambda x: 1 if x['symbol'] in fnosymbols else 0, axis=1)
+        new_cols = ['isin', 'symbol', 'name', 'fnoactivated', 'series', 'dateoflisting', 'paidupvalue', 'marketlot', 'facevalue']
         return df[new_cols]
 
     def getallsymbols(self):
@@ -42,7 +53,7 @@ class Symbols(SDLogger, Config):
         df['dateoflisting'] = pd.to_datetime(df['dateoflisting'])
         # re-order columns
         df.sort_values('symbol', inplace=True, ignore_index=True)
-        new_cols = ['isin', 'symbol', 'name', 'facevalue', 'series', 'dateoflisting', 'paidupvalue', 'marketlot']
+        new_cols = ['isin', 'symbol', 'name', 'fnoactivated', 'facevalue', 'series', 'dateoflisting', 'paidupvalue', 'marketlot']
         df = df[new_cols]
         df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
         return df
