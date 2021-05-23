@@ -11,7 +11,7 @@ __pycache__
 docs/*
 excel/*
 ppt/*
-intradaydata/*
+data/*
 nse_market_preopen_data/*
 .DS_Store
 stockdata.db-journal
