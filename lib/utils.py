@@ -4,6 +4,7 @@ import functools
 import time
 import datetime
 
+
 class Utility():
 
     @staticmethod
@@ -21,11 +22,13 @@ class Utility():
 
     def asfloat(n):
         if n == '-': return 0
-        return float(n.replace(',', ''))
+        if type(n) == str: return float(n.replace(',', ''))
+        return float(n)
 
     def asint(n):
         if n == '-': return 0
-        return int(n.replace(',', ''))
+        if type(n) == str: return int(n.replace(',', ''))
+        return int(n)
 
     @staticmethod
     def adddatefeatures(df):

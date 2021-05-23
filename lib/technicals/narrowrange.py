@@ -2,7 +2,7 @@ import arrow
 import pandas as pd
 import numpy as np
 
-from stockdata.sqlite import SqLite
+from lib.sqlite import SqLite
 
 class NarrowRange():
 

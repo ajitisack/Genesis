@@ -2,8 +2,8 @@ import pandas as pd
 import ta
 
 
-from stockdata.sqlite import SqLite
-from stockdata.utils import Utility
+from lib.sqlite import SqLite
+from lib.utils import Utility
 
 class TrendIndicators():
 

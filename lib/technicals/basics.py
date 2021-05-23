@@ -3,9 +3,14 @@ import pandas as pd
 import numpy as np
 from statistics import mean
 
-from stockdata.sqlite import SqLite
+from lib.config import Config
+from lib.sqlite import SqLite
+from lib.utils  import Utility
 
 class BasicTechnicals():
+
+    def __init__(self):
+        Config.__init__(self)
 
     def getprevdayvalues(self, df):
         n = 1
@@ -48,7 +53,7 @@ class BasicTechnicals():
 
     @SqLite.connector
     def createbasictechnicals(self, date):
-        tblname = self.tbl_nsehpricedly
+        tblname = self.tbl_hpricedly
         query = f"select distinct date from {tblname} where date <= '{date}' order by 1 desc limit 2"
         currdt, prevdt  = pd.read_sql(query, SqLite.conn).date.to_list()
         query = f"select date, symbol, open, low, high, close, volume from {tblname} where date in ('{currdt}', '{prevdt}')"

@@ -4,20 +4,20 @@ import time
 from itertools import repeat
 from concurrent.futures import ThreadPoolExecutor
 
-from stockdata.historicaldata.gethistdata import HistDataDict
-from stockdata.config import Config
-from stockdata.sqlite import SqLite
-from stockdata.utils import Utility
+from nsedata.lib.equityhistdata.gethistdata import EquityHistDataDict
+from nsedata.lib.config import Config
+from nsedata.lib.sqlite import SqLite
+from nsedata.lib.utils import Utility
 
-class HistData(HistDataDict, Config):
+class EquityHistData(EquityHistDataDict, Config):
 
     def __init__(self):
         Config.__init__(self)
 
     @SqLite.connector
-    def getsymbols(self, exchange, n_symbols):
+    def getsymbols(self, n_symbols):
         tblname = 'symbols'
-        if exchange == 'NSE': query = f"select distinct symbol || '.NS' as symbol from {tblname} where innifty200 = 1 or inniftymidcap100 = 1 or inniftysmallcap100 = 1 "
+        query = f"select distinct symbol || '.NS' as symbol from {tblname} where innifty200 = 1 or inniftymidcap100 = 1 or inniftysmallcap100 = 1 "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         symbols = df.symbol.to_list()
@@ -40,9 +40,9 @@ class HistData(HistDataDict, Config):
         return data
 
     @Utility.timer
-    def download(self, exchange, n_symbols, loadtotable, startdt):
-        symbols = self.getsymbols(exchange, n_symbols)
-        print(f'Downloading historical prices(daily, weekly & monthly) and events from yahoo finance for {len(symbols)} {exchange.upper()} symbols from {startdt}', end='...', flush=True)
+    def download(self, n_symbols, loadtotable, startdt):
+        symbols = self.getsymbols(n_symbols)
+        print(f'Downloading historical prices(daily, weekly & monthly) and events from yahoo finance for {len(symbols)} NSE symbols from {startdt}', end='...', flush=True)
         data = self.downloadhistprice(symbols, startdt)
 
         dlyhistprice = pd.concat([pd.DataFrame(i[0]) for i in data], ignore_index=True)
@@ -63,9 +63,9 @@ class HistData(HistDataDict, Config):
         print('Completed !')
 
         if not loadtotable: return dlyhistprice, wlyhistprice, mlyhistprice, events
-        SqLite.loadtable(dlyhistprice, self.tbl_nsehpricedly)
-        SqLite.loadtable(wlyhistprice, self.tbl_nsehpricewly)
-        SqLite.loadtable(mlyhistprice, self.tbl_nsehpricemly)
+        SqLite.loadtable(dlyhistprice, self.tbl_hpricedly)
+        SqLite.loadtable(wlyhistprice, self.tbl_hpricewly)
+        SqLite.loadtable(mlyhistprice, self.tbl_hpricemly)
         # SqLite.createindex(tbl_hprice, 'symbol')
-        SqLite.loadtable(events, self.tbl_nseactions)
+        SqLite.loadtable(events, self.tbl_events)
         # SqLite.createindex(tbl_actions, 'symbol')

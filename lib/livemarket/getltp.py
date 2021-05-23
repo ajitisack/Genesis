@@ -6,11 +6,15 @@ import pandas as pd
 
 from requests.adapters import HTTPAdapter
 
-from stockdata.config import Config
-from stockdata.sqlite import SqLite
-from stockdata.utils import Utility
+from lib.config import Config
+from lib.sqlite import SqLite
+from lib.utils import Utility
 
-class CurrentPrice():
+class LastTradedPrice(Config):
+
+    def __init__(self):
+        Config.__init__(self)
+
 
     def getjsonstr(self, url):
         headers = { "User-Agent": self.user_agent}
@@ -20,7 +24,7 @@ class CurrentPrice():
         json_str = json.loads(response.text)
         return json_str
 
-    def getsymbolscurrentprice(self, json_str):
+    def getsymbolsltp(self, json_str):
         plist = []
         data = json_str['data']
         for i in range(len(data)):
@@ -43,7 +47,7 @@ class CurrentPrice():
         df = pd.DataFrame(plist)
         return df
 
-    def getindicescurrentprice(self, json_str):
+    def getindicesltp(self, json_str):
         plist = []
         data = json_str['data']
         for i in range(len(data)):
@@ -66,3 +70,9 @@ class CurrentPrice():
         # df['openingtype'] = df['openingchange'].apply(lambda x: 'No-Gap' if x == 0 else ('Gap-Up' if x > 0 else 'Declines'))
         # df['movement'] = df['pricechange'].apply(lambda x: 'No-Change' if x == 0 else ('Advances' if x > 0 else 'Declines'))
         return df
+
+
+# LastTradedPrice().getjsonstr('https://www1.nseindia.com/live_market/dynaContent/live_watch/stock_watch/foSecStockWatch.json')
+
+headers = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:80.0) Gecko/20100101 Firefox/80.0"}
+response = requests.get('https://www.nseindia.com/api/equity-stockIndices?index=SECURITIES%20IN%20F%26O')

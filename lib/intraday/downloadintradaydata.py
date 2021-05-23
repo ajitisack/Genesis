@@ -18,14 +18,13 @@ class IntraDayData(IntraDayDataDict, Config):
     @SqLite.connector
     def getsymbols(self, exchange, n_symbols):
         tblname = 'symbols'
-        if exchange == 'NSE': query = f"select distinct symbol || '.NS' as symbol from {tblname} where innifty100 = 1 or fnoactivated = 1 "
+        query = f"select distinct symbol || '.NS' as symbol from {tblname} where innifty100 = 1 or fnoactivated = 1 "
         if n_symbols > 0: query += f'limit {n_symbols}'
         df = pd.read_sql(query, SqLite.conn)
         return list(df.symbol)
 
     def processdf(self, df):
-        # df['timestamp'] = df['timestamp'].apply(lambda x: arrow.get(x).to('local').format('YYYY-MM-DD HH:mm'))
-        # df['exchange'] = df['symbol'].apply(lambda x: 'BSE' if x.split('.')[1] == 'BO' else 'NSE')
+        df['timestamp'] = df['timestamp'].apply(lambda x: arrow.get(x).to('local').format('YYYY-MM-DD HH:mm'))
         df['symbol'] = df['symbol'].apply(lambda x: x.split('.')[0].replace('^', ''))
         df = Utility.addtimefeatures(df)
         return df

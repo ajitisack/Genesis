@@ -4,19 +4,19 @@ import requests
 import json
 from collections import defaultdict
 
-from stockdata.utils import Utility
-from stockdata.sdlogger import SDLogger
-from stockdata.config import Config
-from stockdata.sqlite import SqLite
+from nsedata.lib.utils   import Utility
+from nsedata.lib.logger  import Logger
+from nsedata.lib.config  import Config
+from nsedata.lib.sqlite  import SqLite
 
-class Symbols(SDLogger, Config):
+class Symbols(Logger, Config):
 
     def __init__(self):
         Config.__init__(self)
 
     def getfnosymbols(self):
         headers = { "User-Agent": self.user_agent}
-        response = requests.get(self.nse_equitypriceurl, headers=headers)
+        response = requests.get(self.url_symbolsltp, headers=headers)
         json_str = json.loads(response.text)
         fnosymbols = pd.DataFrame(json_str['data'])['symbol'].to_list()
         return fnosymbols
@@ -36,7 +36,7 @@ class Symbols(SDLogger, Config):
 
     def getnsesymbols(self):
         cols = ['symbol', 'name', 'series', 'dateoflisting', 'paidupvalue', 'marketlot', 'isin', 'facevalue']
-        df = pd.read_csv(self.nselist, names = cols, header=0)
+        df = pd.read_csv(self.url_equitylist, names = cols, header=0)
         df['name'] = df['name'].apply(lambda x : self.cleanstr(x))
         # df['dateoflisting'] = df['dateoflisting'].astype('datetime64[D]')
         df.fillna('', inplace=True)
@@ -57,14 +57,10 @@ class Symbols(SDLogger, Config):
         df = df[new_cols]
         df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
         return df
-        # with pd.ExcelWriter(self.excel_seclist) as writer:
-        #     bse.to_excel(writer, sheet_name='BSE', index=False, freeze_panes=(1,0))
-        #     nse.to_excel(writer, sheet_name='NSE', index=False, freeze_panes=(1,0))
-        #     df.to_excel(writer, sheet_name='All', index=False, freeze_panes=(1,0))
 
     @Utility.timer
     def download(self):
-        tblname = self.tbl_nsesymbols
+        tblname = self.tbl_symbols
         print(f'Fetching list of all NSE Equities', end='...', flush=True)
         df = self.getallsymbols()
         print('Completed')

@@ -4,12 +4,12 @@ import arrow
 import time
 from requests.adapters import HTTPAdapter
 
-from stockdata.sdlogger import SDLogger
-from stockdata.config import Config
-from stockdata.sqlite import SqLite
-from stockdata.utils import Utility
+from nsedata.lib.logger import Logger
+from nsedata.lib.config import Config
+from nsedata.lib.sqlite import SqLite
+from nsedata.lib.utils  import Utility
 
-class HistDataDict(SDLogger):
+class EquityHistDataDict(Logger):
 
     def __init__(self):
         Config.__init__(self)
@@ -50,17 +50,17 @@ class HistDataDict(SDLogger):
         d_splits['action'] = 'splits'
         d_splits['value'] = [splits.get(k).get('numerator')/splits.get(k).get('denominator') for k, v in splits.items()]
         return d_splits
-        
+
 
     def getchartresult(self, symbol, startdt, interval):
         params = {}
-        params['period1']  = arrow.get(startdt).timestamp
+        params['period1']  = int(arrow.get(startdt).timestamp())
         params['period2']  = 9999999999
         # params['period2']  = arrow.now().shift(days=1).timestamp
         params['interval'] = interval
         if interval == '1d': params['events'] = 'div,split'
         params['includePrePost'] = 'true'
-        url = f'{self.yfqueryurl}/{symbol}'
+        url = f'{self.url_yfprice}/{symbol}'
         with requests.Session() as session:
             session.mount(url, HTTPAdapter(max_retries=self.request_max_retries))
             response = session.get(url, params=params)

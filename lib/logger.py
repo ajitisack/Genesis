@@ -2,7 +2,7 @@ import logging
 from logging import FileHandler
 from logging import Formatter
 
-class SDLogger():
+class Logger():
 
     @property
     def msglogger(self):

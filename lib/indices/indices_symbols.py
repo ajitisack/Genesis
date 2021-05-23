@@ -2,9 +2,9 @@ import arrow
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 
-from stockdata.config import Config
-from stockdata.sqlite import SqLite
-from stockdata.utils  import Utility
+from nsedata.lib.config import Config
+from nsedata.lib.sqlite import SqLite
+from nsedata.lib.utils  import Utility
 
 class IndicesSymbols(Config):
 
@@ -35,21 +35,15 @@ class IndicesSymbols(Config):
         return df
 
     @Utility.timer
-    def downloadindicessymbols(self, exchange, loadtotable):
-        if exchange == 'NSE':
-            func_indexsymbols = self.getnseindexsymbols
-            tbl_indices       = self.tbl_nseindices
-        if exchange == 'BSE':
-            func_indexsymbols = self.getbseindexsymbols
-            tbl_indices       = self.tbl_bseindices
-        indices = self.readIndices(exchange)
-        print(f'Downloading symbols of {indices.shape[0]} {exchange.upper()} indices from nseindia.com', end='...', flush=True)
+    def download(self, loadtotable):
+        indices = self.readIndices('NSE')
+        print(f'Downloading symbols of {indices.shape[0]} indices from nseindia.com', end='...', flush=True)
         params = zip(indices.exchange, indices.type, indices.name, indices.yfsymbol, indices.url)
         nthreads = min(indices.shape[0], int(self.maxthreads))
         with ThreadPoolExecutor(max_workers=nthreads) as executor:
-            results = executor.map(func_indexsymbols, params)
+            results = executor.map(self.getnseindexsymbols, params)
         df = pd.concat(list(results), ignore_index=True)
         df = self.processdf(df)
         print('Completed')
         if not loadtotable: return df
-        SqLite.loadtable(df, tbl_indices)
+        SqLite.loadtable(df, self.tbl_indices)

@@ -6,7 +6,6 @@ class Config():
 
     def __init__(self):
         cp = ConfigParser(interpolation=ExtendedInterpolation())
-        # cp.read(r'C:/ajit/stockanalysis/stockdata/config.ini')
         config_file = f'{os.path.dirname(__file__)}/config.ini'
         cp.read(config_file)
         for section in cp.sections():

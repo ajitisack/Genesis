@@ -1,13 +1,13 @@
 import arrow
 import pandas as pd
 
-from stockdata.config import Config
-from stockdata.sqlite import SqLite
-from stockdata.utils import Utility
+from lib.config import Config
+from lib.sqlite import SqLite
+from lib.utils import Utility
 
-from stockdata.technicals.basics import BasicTechnicals
-from stockdata.technicals.narrowrange import NarrowRange
-from stockdata.technicals.pivotpoints import PivotPoints
+from lib.technicals.basics import BasicTechnicals
+from lib.technicals.narrowrange import NarrowRange
+from lib.technicals.pivotpoints import PivotPoints
 
 class Technicals(Config, BasicTechnicals, NarrowRange, PivotPoints):
 
@@ -15,8 +15,8 @@ class Technicals(Config, BasicTechnicals, NarrowRange, PivotPoints):
         Config.__init__(self)
 
     @Utility.timer
-    def loadtechnicals(self, date, loadtotable=True):
-        tblname = self.tbl_nsetechnicals
+    def loadtable(self, date=arrow.now().format('YYYY-MM-DD'), loadtotable=True):
+        tblname = self.tbl_technicals
         tblname = tblname if date == arrow.now().format('YYYY-MM-DD') else f"{tblname}_{date.replace('-', '')}"
         print(f'Calculating technicals based on price values for NSE symbols as of {date}', end='...', flush=True)
         df1 = self.createbasictechnicals(date)
@@ -29,3 +29,5 @@ class Technicals(Config, BasicTechnicals, NarrowRange, PivotPoints):
         print('Completed!')
         if not loadtotable: return df
         SqLite.loadtable(df, tblname)
+
+df = Technicals().loadtable('')

@@ -7,7 +7,6 @@ create view symbols as
     select
       a.isin
     , a.symbol
-    , case when b.symbol is null then 0 else 1 end inhotlist
     , fnoactivated
     , case when c.symbol is null then 0 else 1 end innifty50
 	, case when d.symbol is null then 0 else 1 end innifty100
@@ -17,22 +16,20 @@ create view symbols as
     , case when h.symbol is null then 0 else 1 end inniftysmallcap50
     , case when i.symbol is null then 0 else 1 end inniftysmallcap100
     , a.name
-    , b.sector
     , a.facevalue
     , a.series
     , a.dateoflisting
     , a.paidupvalue
     , a.marketlot
     , a.runts
-    from NSE_EquitySymbols a
-        left outer join NSE_MyWatchlist b on a.symbol = b.symbol
-        left outer join NSE_Indices c on a.symbol = c.symbol and c.indexname = 'Nifty 50'
-		left outer join NSE_Indices d on a.symbol = d.symbol and d.indexname = 'Nifty 100'
-        left outer join NSE_Indices e on a.symbol = e.symbol and e.indexname = 'Nifty 200'
-        left outer join NSE_Indices f on a.symbol = f.symbol and f.indexname = 'Nifty Midcap 50'
-        left outer join NSE_Indices g on a.symbol = g.symbol and g.indexname = 'Nifty Midcap 100'
-        left outer join NSE_Indices h on a.symbol = h.symbol and h.indexname = 'Nifty Smallcap 50'
-        left outer join NSE_Indices i on a.symbol = i.symbol and i.indexname = 'Nifty Smallcap 100'
+    from EquitySymbols a
+        left outer join Indices c on a.symbol = c.symbol and c.indexname = 'Nifty 50'
+		left outer join Indices d on a.symbol = d.symbol and d.indexname = 'Nifty 100'
+        left outer join Indices e on a.symbol = e.symbol and e.indexname = 'Nifty 200'
+        left outer join Indices f on a.symbol = f.symbol and f.indexname = 'Nifty Midcap 50'
+        left outer join Indices g on a.symbol = g.symbol and g.indexname = 'Nifty Midcap 100'
+        left outer join Indices h on a.symbol = h.symbol and h.indexname = 'Nifty Smallcap 50'
+        left outer join Indices i on a.symbol = i.symbol and i.indexname = 'Nifty Smallcap 100'
     where 1 = 1
 ;
 
@@ -44,11 +41,11 @@ create view indices as
 
 drop view if exists histprice;
 create view histprice as
-    select 'd' freq, * from NSE_EquityHistoricalPricesDaily
+    select 'd' freq, * from EquityHistoricalPricesDaily
     union all
-    select 'w' freq, * from NSE_EquityHistoricalPricesWeekly
+    select 'w' freq, * from EquityHistoricalPricesWeekly
     union all
-    select 'm' freq, * from NSE_EquityHistoricalPricesMonthly
+    select 'm' freq, * from EquityHistoricalPricesMonthly
 ;
 
 
