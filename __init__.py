@@ -1,7 +1,10 @@
-from nsedata.lib.main import downloadsymbols
-from nsedata.lib.main import downloadequityhistdata
-from nsedata.lib.main import downloadindicesdetails
-from nsedata.lib.main import downloadpreopendata
+from nsedata.main import downloadsymbols
+from nsedata.main import downloadequityhistdata
+from nsedata.main import downloadindicesdetails
+from nsedata.main import downloadpreopendata
+from nsedata.main import downloadpreopendata
+from nsedata.main import downloadequityintraday
+from nsedata.main import createequityintradaymonthlyfile
 
 # from lib.main import downloadsymbols
 # from lib.main import loadtotable

@@ -65,7 +65,7 @@ class Utility():
         df['time']    = df['timestamp'].dt.time
         df['after12'] = df['time'].apply(lambda x: 1 if x >= datetime.time(12,0) else 0)
         df['dayhour'] = df['time'].apply(lambda x: Utility.hoursbinning(x))
-        df['timestamp'] = df['timestamp'].apply(lambda x: x.strftime("%a %b-%d-%Y %H:%M"))
+        df['timestamp'] = df['timestamp'].apply(lambda x: x.strftime("%a %d-%b-%Y %H:%M"))
         df['time'] = df['time'].apply(lambda x: x.strftime("%H:%M"))
         return df
 

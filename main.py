@@ -8,6 +8,7 @@ from nsedata.lib.symbols.getsymbols import Symbols
 from nsedata.lib.equityhistdata.loadhistdata import EquityHistData
 from nsedata.lib.indices.indices_symbols import IndicesSymbols
 from nsedata.lib.preopendata.download import MarketPreOpen
+from nsedata.lib.intraday.download import IntraDayData
 
 # to download NSE symbols
 def downloadsymbols():
@@ -21,6 +22,12 @@ def downloadindicesdetails(loadtotable=True):
 
 def downloadpreopendata(loadtotable=True):
     return MarketPreOpen().download(loadtotable)
+
+def downloadequityintraday(date, n_symbols=0):
+    return IntraDayData().downloadallfiles(date, n_symbols)
+
+def createequityintradaymonthlyfile(date):
+    return IntraDayData().createmonthlyfile(date)
 
 
 #

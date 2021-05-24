@@ -3,7 +3,7 @@ import requests
 import arrow
 from requests.adapters import HTTPAdapter
 
-from stockdata.config import Config
+from nsedata.lib.config import Config
 
 class IntraDayDataDict():
 
@@ -28,14 +28,13 @@ class IntraDayDataDict():
 
     def getchartresult(self, symbol, date, interval):
         try:
-            params = {}
-            params['period1']  = arrow.get(date).timestamp
-            params['period2']  = arrow.get(date).shift(days=1).timestamp
-            params['interval'] = interval
-            url = f'{self.yfqueryurl}/{symbol}'
+            p1   = str(arrow.get(f'{date} 09:00:00 Asia/Calcutta', 'YYYY-MM-DD HH:mm:ss ZZZ').timestamp()).split('.')[0]
+            p2   = str(arrow.get(f'{date} 16:00:00 Asia/Calcutta', 'YYYY-MM-DD HH:mm:ss ZZZ').timestamp()).split('.')[0]
+            freq = interval
+            url = f'{self.url_yfprice}/{symbol}?period1={p1}&period2={p2}&interval={freq}'
             with requests.Session() as session:
                 session.mount(url, HTTPAdapter(max_retries=self.request_max_retries))
-                response = session.get(url, params=params)
+                response = session.get(url)
             chartdata = json.loads(response.text).get('chart').get('result')[0]
             return chartdata
         except:
