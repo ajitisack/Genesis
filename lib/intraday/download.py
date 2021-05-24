@@ -55,12 +55,12 @@ class IntraDayData(IntraDayDataDict, Config):
         df_30m = self.download(date, symbols, '30m')
         df_1h  = self.download(date, symbols, '1h')
         df = pd.concat([df_1m, df_5m, df_15m, df_30m, df_1h])
-        print(f'Rows and Columns in downloaded data file - {df.shape}')
-        print('Rows and Columns of NIFTY and BANKNIFTY data for each interval...')
-        print(df[(df.symbol.isin(['NSEI', 'NSEBANK']))][['freq', 'symbol']].value_counts())
         file = f"{self.intraday_dir}/NSE_{date.replace('-','')}.zip"
         df.to_csv(file, index=False, compression='zip')
         print('Completed!')
+        print(f'Rows and Columns in downloaded data file - {df.shape}')
+        print('Rows and Columns of NIFTY and BANKNIFTY data for each interval...')
+        print(df[(df.symbol.isin(['NSEI', 'NSEBANK']))][['freq', 'symbol']].value_counts())
 
 
     @Utility.timer

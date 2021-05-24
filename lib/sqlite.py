@@ -36,6 +36,16 @@ class SqLite():
 
 	@staticmethod
 	@connector
+	def appendtable(df, tblname):
+		if df.empty:
+			print('Dataframe is empty!')
+			return None
+		print(f'Appending table [{tblname}] with {df.shape[0]} records', end='...', flush=True)
+		df.to_sql(tblname, SqLite.conn, if_exists='append', index=False)
+		print('Completed')
+
+	@staticmethod
+	@connector
 	def createindex(tblname, indexcol):
 		indexname = f'index_{tblname}_{indexcol}'
 		print(f'Creating index on {tblname}({indexcol})', end='...', flush=True)

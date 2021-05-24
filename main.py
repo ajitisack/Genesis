@@ -10,6 +10,8 @@ from nsedata.lib.indices.indices_symbols import IndicesSymbols
 from nsedata.lib.preopendata.download import MarketPreOpen
 from nsedata.lib.intraday.download import IntraDayData
 
+from nsedata.lib.participantdata.download import ParticipantData
+
 # to download NSE symbols
 def downloadsymbols():
     return Symbols().download()
@@ -29,6 +31,11 @@ def downloadequityintraday(date, n_symbols=0):
 def createequityintradaymonthlyfile(date):
     return IntraDayData().createmonthlyfile(date)
 
+def downloadparticipantwisedata():
+    x = ParticipantData()
+    x.download(loadtotable=True, type='oi')
+    x.download(loadtotable=True, type='vol')
+    x.download(loadtotable=True, type='fiistat')
 
 #
 # @SqLite.connector

@@ -3,6 +3,7 @@ import numpy as np
 import functools
 import time
 import datetime
+import arrow
 
 
 class Utility():
@@ -92,3 +93,16 @@ class Utility():
             print(f'Finished [{func.__name__}] in {run_time:.4f} secs')
             return value
         return wrapper_timer
+
+    @staticmethod
+    def getworkingdays(startdt, enddt):
+        holidays = pd.read_csv('/Users/ajit/Projects/nsedata/holidays.txt').holidays.to_list()
+        dates = []
+        dt = startdt
+        while dt <= enddt:
+            if dt.format('d') in ['6', '7'] or dt.format('YYYY-MM-DD') in holidays:
+                dt = dt.shift(days=+1)
+                continue
+            dates.append(dt)
+            dt = dt.shift(days=+1)
+        return dates

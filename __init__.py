@@ -5,6 +5,7 @@ from nsedata.main import downloadpreopendata
 from nsedata.main import downloadpreopendata
 from nsedata.main import downloadequityintraday
 from nsedata.main import createequityintradaymonthlyfile
+from nsedata.main import downloadparticipantwisedata
 
 # from lib.main import downloadsymbols
 # from lib.main import loadtotable
