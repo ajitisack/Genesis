@@ -72,7 +72,7 @@ class IntraDayData(IntraDayDataDict, Config):
             print('Error!')
             print(f'No file(s) matching with {self.intraday_dir}/NSE_{yyyymm}*.zip')
             return None
-        print(f'Combining {exchange.upper()} intraday daily files for month {yyyymm}', end='...', flush=True)
+        print(f'Combining NSE intraday daily files for month {yyyymm}', end='...', flush=True)
         dfs = [pd.read_csv(file) for file in infiles]
         df = pd.concat(dfs, ignore_index=True)
         df.to_csv(outfile, index=False, compression='zip')

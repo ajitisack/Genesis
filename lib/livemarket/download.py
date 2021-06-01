@@ -35,6 +35,3 @@ class LiveMarket(LastTradedPrice, Config):
         df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
         print(f'Completed !')
         SqLite.loadtable(df, self.tbl_indicesltp)
-
-# LiveMarket().downloadindicesltp()
-LiveMarket().downloadsymbolsltp()

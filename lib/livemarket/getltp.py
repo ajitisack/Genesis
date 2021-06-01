@@ -70,9 +70,3 @@ class LastTradedPrice(Config):
         # df['openingtype'] = df['openingchange'].apply(lambda x: 'No-Gap' if x == 0 else ('Gap-Up' if x > 0 else 'Declines'))
         # df['movement'] = df['pricechange'].apply(lambda x: 'No-Change' if x == 0 else ('Advances' if x > 0 else 'Declines'))
         return df
-
-
-# LastTradedPrice().getjsonstr('https://www1.nseindia.com/live_market/dynaContent/live_watch/stock_watch/foSecStockWatch.json')
-
-headers = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:80.0) Gecko/20100101 Firefox/80.0"}
-response = requests.get('https://www.nseindia.com/api/equity-stockIndices?index=SECURITIES%20IN%20F%26O')

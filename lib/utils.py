@@ -5,6 +5,7 @@ import time
 import datetime
 import arrow
 
+from nsedata.lib.sqlite import SqLite
 
 class Utility():
 
@@ -94,9 +95,9 @@ class Utility():
             return value
         return wrapper_timer
 
-    @staticmethod
-    def getworkingdays(startdt, enddt):
-        holidays = pd.read_csv('/Users/ajit/Projects/nsedata/holidays.txt').holidays.to_list()
+
+    def getworkingdays(self, startdt, enddt):
+        holidays = pd.read_csv(self.holidaysfile).holidays.to_list()
         dates = []
         dt = startdt
         while dt <= enddt:
@@ -106,3 +107,15 @@ class Utility():
             dates.append(dt)
             dt = dt.shift(days=+1)
         return dates
+
+    @SqLite.connector
+    def getmaxdate(self, tbl):
+        try :
+            query = f"select max(date) date from {tbl}"
+            dt = pd.read_sql(query, SqLite.conn).date.to_list()[0]
+            dt = arrow.get(f'{dt} 19:00:00 Asia/Calcutta', 'YYYY-MM-DD HH:mm:ss ZZZ')
+            dt = dt.shift(days=+1)
+            return dt
+        except:
+            dt = arrow.get(f'{self.startdt} 19:00:00 Asia/Calcutta', 'YYYY-MM-DD HH:mm:ss ZZZ')
+            return dt

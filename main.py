@@ -7,10 +7,11 @@ from nsedata.lib.utils import Utility
 from nsedata.lib.symbols.getsymbols import Symbols
 from nsedata.lib.equityhistdata.loadhistdata import EquityHistData
 from nsedata.lib.indices.indices_symbols import IndicesSymbols
-from nsedata.lib.preopendata.download import MarketPreOpen
+from nsedata.lib.preopen.download import MarketPreOpen
 from nsedata.lib.intraday.download import IntraDayData
 
 from nsedata.lib.participantdata.download import ParticipantData
+from nsedata.lib.fno_bhavcopy.download import FNOBhavcopy
 
 # to download NSE symbols
 def downloadsymbols():
@@ -33,9 +34,15 @@ def createequityintradaymonthlyfile(date):
 
 def downloadparticipantwisedata():
     x = ParticipantData()
-    x.download(loadtotable=True, type='oi')
-    x.download(loadtotable=True, type='vol')
-    x.download(loadtotable=True, type='fiistat')
+    x.download('oi')
+    x.download('vol')
+    x.download('fiistat')
+
+def downloadFNOBhavcopy():
+    return FNOBhavcopy().download()
+
+
+
 
 #
 # @SqLite.connector
