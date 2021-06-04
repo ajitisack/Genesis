@@ -75,15 +75,15 @@ class ParticipantData(Logger, Config, Utility):
 
 
     @Utility.timer
-    def download(self, type):
+    def download(self, type, startdt=None, enddt=None):
         df = pd.DataFrame()
-        dt = self.getmaxdate(self.tbl[type])
-        enddt = arrow.now()
+        dt = arrow.get(startdt) if startdt else self.getmaxdate(self.tbl[type])
+        enddt = arrow.get(enddt) if enddt else arrow.now()
         dates = self.getworkingdays(dt, enddt)
         if not dates:
             print(f'{type} data - All upto date!')
             return None
-        print(f"Downloading {self.msg[type]} data from {dt.format('YYYY-MM-DD')} to {arrow.now().format('YYYY-MM-DD')}")
+        print(f"Downloading {self.msg[type]} data from {dt.format('YYYY-MMM-DD')} to {enddt.format('YYYY-MMM-DD')}")
         dfs = [self.func[type](date) for date in dates]
         if dfs:
             df = pd.concat(dfs, ignore_index=True)

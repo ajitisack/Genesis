@@ -12,6 +12,8 @@ from nsedata.lib.intraday.download import IntraDayData
 
 from nsedata.lib.participantdata.download import ParticipantData
 from nsedata.lib.fno_bhavcopy.download import FNOBhavcopy
+from nsedata.lib.equity_bhavcopy.download import EquityBhavcopy
+from nsedata.lib.indices.indices_price import IndicesPrice
 
 # to download NSE symbols
 def downloadsymbols():
@@ -32,16 +34,20 @@ def downloadequityintraday(date, n_symbols=0):
 def createequityintradaymonthlyfile(date):
     return IntraDayData().createmonthlyfile(date)
 
-def downloadparticipantwisedata():
+def downloadparticipantwisedata(startdt=None, enddt=None):
     x = ParticipantData()
-    x.download('oi')
-    x.download('vol')
-    x.download('fiistat')
+    x.download('oi', startdt, enddt)
+    x.download('vol', startdt, enddt)
+    x.download('fiistat', startdt, enddt)
 
-def downloadFNOBhavcopy():
-    return FNOBhavcopy().download()
+def downloadFNOBhavcopy(startdt=None, enddt=None):
+    return FNOBhavcopy().download(startdt, enddt)
 
+def downloadEquityBhavcopy(startdt=None, enddt=None):
+    return EquityBhavcopy().download(startdt, enddt)
 
+def downloadIndicesPrice(startdt=None, enddt=None):
+    return IndicesPrice().download(startdt, enddt)
 
 
 #

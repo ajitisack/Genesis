@@ -9,6 +9,8 @@ from nsedata.main import createequityintradaymonthlyfile
 
 from nsedata.main import downloadparticipantwisedata
 from nsedata.main import downloadFNOBhavcopy
+from nsedata.main import downloadEquityBhavcopy
+from nsedata.main import downloadIndicesPrice
 
 # from lib.main import downloadsymbols
 # from lib.main import loadtotable
