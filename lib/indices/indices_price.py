@@ -43,4 +43,5 @@ class IndicesPrice(Config, Utility):
         if dfs:
             df = pd.concat(dfs, ignore_index=True)
             df = Utility.adddatefeatures(df)
+            df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm:ss')
         if not df.empty : SqLite.appendtable(df, self.tbl_indiceshistprice)

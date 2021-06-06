@@ -5,10 +5,10 @@ import pandas as pd
 
 from requests.adapters import HTTPAdapter
 
-from lib.config import Config
-from lib.sqlite import SqLite
-from lib.utils  import Utility
-from lib.livemarket.getltp import LastTradedPrice
+from nsedata.lib.config import Config
+from nsedata.lib.sqlite import SqLite
+from nsedata.lib.utils  import Utility
+from nsedata.lib.livemarket.getltp import LastTradedPrice
 
 class LiveMarket(LastTradedPrice, Config):
 
@@ -21,7 +21,7 @@ class LiveMarket(LastTradedPrice, Config):
         json_str = self.getjsonstr(self.url_symbolsltp)
         df = self.getindicesltp(json_str)
         df = Utility.reducesize(df)
-        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
+        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm:ss')
         print(f'Completed !')
         SqLite.loadtable(df, self.tbl_symbolsltp)
 
@@ -32,6 +32,6 @@ class LiveMarket(LastTradedPrice, Config):
         df = self.getsymbolsltp(json_str)
         return df
         df = Utility.reducesize(df)
-        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
+        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm:ss')
         print(f'Completed !')
         SqLite.loadtable(df, self.tbl_indicesltp)

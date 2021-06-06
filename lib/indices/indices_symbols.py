@@ -31,7 +31,7 @@ class IndicesSymbols(Config):
         df.rename(columns={'company name':'company', 'isin code':'isin'}, inplace=True)
         df['industry'] = df['industry'].apply(lambda x: x.title() if x != 'IT' else x)
         df['company'] = df['company'].apply(lambda x: x.replace(' Ltd.', ''))
-        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
+        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm:ss')
         return df
 
     @Utility.timer

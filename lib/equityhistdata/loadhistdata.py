@@ -29,7 +29,7 @@ class EquityHistData(EquityHistDataDict, Config):
         df['symbol'] = df['symbol'].apply(lambda x: x.split('.')[0].replace('^', ''))
         df = Utility.adddatefeatures(df)
         df = Utility.reducesize(df)
-        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
+        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm:ss')
         return df
 
     def downloadhistprice(self, symbols_list, startdt):

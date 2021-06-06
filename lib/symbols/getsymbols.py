@@ -55,7 +55,7 @@ class Symbols(Logger, Config):
         df.sort_values('symbol', inplace=True, ignore_index=True)
         new_cols = ['isin', 'symbol', 'name', 'fnoactivated', 'facevalue', 'series', 'dateoflisting', 'paidupvalue', 'marketlot']
         df = df[new_cols]
-        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
+        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm:ss')
         return df
 
     @Utility.timer

@@ -6,15 +6,14 @@ import pandas as pd
 
 from requests.adapters import HTTPAdapter
 
-from lib.config import Config
-from lib.sqlite import SqLite
-from lib.utils import Utility
+from nsedata.lib.config import Config
+from nsedata.lib.sqlite import SqLite
+from nsedata.lib.utils import Utility
 
 class LastTradedPrice(Config):
 
     def __init__(self):
         Config.__init__(self)
-
 
     def getjsonstr(self, url):
         headers = { "User-Agent": self.user_agent}

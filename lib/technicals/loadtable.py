@@ -25,7 +25,7 @@ class Technicals(Config, BasicTechnicals, NarrowRange, PivotPoints):
         df = self.createpivotpoints(df)
         df = self.createtomorrowpivotpoints(df)
         df = Utility.reducesize(df)
-        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm')
+        df['runts'] = arrow.now().format('ddd MMM-DD-YYYY HH:mm:ss')
         print('Completed!')
         if not loadtotable: return df
         SqLite.loadtable(df, tblname)

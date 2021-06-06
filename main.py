@@ -15,6 +15,8 @@ from nsedata.lib.fno_bhavcopy.download import FNOBhavcopy
 from nsedata.lib.equity_bhavcopy.download import EquityBhavcopy
 from nsedata.lib.indices.indices_price import IndicesPrice
 
+from nsedata.lib.optionchain.download_option_chain import IndexOptionChain
+
 # to download NSE symbols
 def downloadsymbols():
     return Symbols().download()
@@ -49,52 +51,18 @@ def downloadEquityBhavcopy(startdt=None, enddt=None):
 def downloadIndicesPrice(startdt=None, enddt=None):
     return IndicesPrice().download(startdt, enddt)
 
+def getOptionChain(symbol='NIFTY'):
+    return IndexOptionChain().getOptionChain(symbol)
+
+def downloadIndexOptionChain():
+    return IndexOptionChain().downloadIndexOptionChain()
+
+def streamIndexOptionChain(start_time='09:30', end_time='15:30', freq=5):
+    return IndexOptionChain().startDownload(start_time, end_time, freq)
 
 #
 # @SqLite.connector
 # def getdata(query):
 #     df = pd.read_sql(query, SqLite.conn)
 #     df = Utility.reducesize(df)
-#     return df
-#
-# def getnsehistprice(symbol):
-#     if type(symbol) == list:
-#         symbol = map(lambda x: x.upper().strip(), symbol)
-#         symbol = "','".join(symbol)
-#     symbol = symbol.upper().strip()
-#     df = getdata(f"select * from histprice where symbol in ('{symbol}')")
-#     df['date'] = pd.to_datetime(df['date'])
-#     df.set_index('date', inplace=True)
-#     return df
-#
-# # needs to be corrected
-# def getweeklynsehistprice(symbol):
-#     df = getnsehistprice(symbol)
-#     cols = df.columns
-#     df = df.reset_index()
-#     df = df.groupby(['symbol', 'year', 'wknr']).last().reset_index().set_index('date')
-#     return df[cols]
-#
-# # needs to be corrected
-# def getmonthlynsehistprice(symbol):
-#     df = getnsehistprice(symbol)
-#     cols = df.columns
-#     df = df.reset_index()
-#     df = df.groupby(['symbol', 'year', 'month']).last().reset_index().set_index('date')
-#     return df[cols]
-#
-# # needs to be corrected
-# def getyearlynsehistprice(symbol):
-#     df = getnsehistprice(symbol)
-#     cols = df.columns
-#     df = df.reset_index()
-#     df = df.groupby(['symbol', 'year']).last().reset_index().set_index('date')
-#     return df[cols]
-#
-# def loadtotable(df, tblname):
-#     df = Utility.reducesize(df)
-#     SqLite.loadtable(df, tblname)
-#
-# def searchsymbol(name):
-#     df = getdata(f"select * from symbols where name like '%{name.upper()}%' or symbol like '%{name.upper()}%'   ")
 #     return df

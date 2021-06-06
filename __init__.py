@@ -12,6 +12,11 @@ from nsedata.main import downloadFNOBhavcopy
 from nsedata.main import downloadEquityBhavcopy
 from nsedata.main import downloadIndicesPrice
 
+from nsedata.main import getOptionChain
+from nsedata.main import downloadIndexOptionChain
+from nsedata.main import streamIndexOptionChain
+
+
 # from lib.main import downloadsymbols
 # from lib.main import loadtotable
 # from lib.main import searchsymbol
